@@ -20,11 +20,13 @@ transcriptomica/
 │   ├── star/                    # Alineamientos con STAR
 │   │   ├── paired_end/          # Alineamientos paired-end
 │   │   └── single_end/          # Alineamientos single-end
-│   └── Reporte.md               # Este reporte
-└── src/                         # Scripts de análisis
-    ├── fastp_limpieza.sh        # Script de limpieza de datos
-    ├── hisat2_alineamientos.sh  # Script de alineamiento con HISAT2
-    └── star_alineamientos.sh    # Script de alineamiento con STAR
+│   └── Reporte.md               # Reporte 
+├── src/                         # Scripts de análisis
+│   ├── fastp_limpieza.sh        # Script de limpieza de datos
+│   ├── hisat2_alineamientos.sh  # Script de alineamiento con HISAT2
+│   └── star_alineamientos.sh    # Script de alineamiento con STAR
+└── README.md                    # Este archivo
+
 ```
 
 ## Flujo de Trabajo (Workflow)
