@@ -48,6 +48,6 @@ transcriptomica/
 
 ## Reporte de Resultados
 
-Para ver los detalles completos de este proyecto, consultar el **[Reporte Analítico (results/Reporte.md)](results/Reporte.md)**. 
+Para ver los detalles completos de este proyecto, consultar el **[Reporte Analítico](results/Reporte.md)**. 
 
 Autor: Andrea Villarruel García
