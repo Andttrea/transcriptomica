@@ -13,7 +13,7 @@ transcriptomica/
 │   ├── fastqc/                  # Reportes de control de calidad inicial
 │   │   └── multiqc_report_data/ # Datos consolidados de MultiQC
 │	│		└── images			 # Plots de multiqc
-│   ├── metadata/                # Metadatos y scripts auxiliares
+│   ├── metadata/               # Metadatos y scripts auxiliares
 │   └── SRRs/                    # Secuencias raw descargadas
 ├── results/
 │   ├── hisat2/                  # Alineamientos con HISAT2
@@ -31,7 +31,11 @@ transcriptomica/
 
 ## 1. Descarga de Datos
 
-Los datos de secuencias se encuentran en la carpeta `data/SRRs/`, en formato FASTQ descargados de repositorios públicos, con el uso de `fasterq-dump` y `prefetch`
+El presente estudio se fundamentó en el conjunto de datos del consorcio Tabula Muris Senis, que integra perfiles transcriptómicos a través de diversos tejidos y etapas del desarrollo.
+
+Para los fines de esta investigación, se extrajeron específicamente las muestras pertenecientes al músculo de las extremidades (limb muscle). El diseño experimental se centró en una comparación contrastante entre individuos machos de 9 y 24 meses
+
+Los datos de secuencias se encuentran en la carpeta `data/SRRs/`, en formato FASTQ descargados de repositorios públicos, con el uso de `fasterq-dump` y `prefetch`. 
 
 
 ## 2. Control de Calidad Inicial
@@ -61,20 +65,23 @@ Los reportes HTML de FastQC y MultiQC revelan que los datos presentan buena cali
 - Todas las secuencias tienen una longitud estándar de 100 pb (Illumina)
 - Buena calidad promedio de bases por posición
 
-![multiqc per_sequence_quality_scores_plot](/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence_quality_plot.png)
+![multiqc per_sequence_quality_scores_plot](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence_quality_plot.png)
 Fig 1. Per Sequence Quality Scores
 
 **Contenido de Bases:**
-Se observó variación en el contenido de bases en las primeras 15 posiciones de las secuencias, después de las cuales se estabiliza (Fig. 2). Este patrón es típico en librerías de Illumina y puede resolverse eliminando las primeras 15-18 pb durante la limpieza.
+Se observó variación en el contenido de bases en las primeras 15 posiciones de las secuencias, después de las cuales se estabiliza (Fig. 2 y Fig. 3). Este patrón es típico en librerías de Illumina y puede resolverse eliminando las primeras 15-18 pb durante la limpieza.
 
-![Sequence_content.png](/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence_content_plot.png)
+![Sequence_content.png](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence_content_plot.png)
 Fig. 2. Per base sequence content
+
+![Sequence_content_SRR126694_1](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence-SRR126694_1.png)
+Fig. 3. Per base sequence content SRR126694_1
 
 **Duplicación de Secuencias:**
 Se detectan niveles moderados a altos de duplicación de secuencias (Fig. 3). Sin embargo, como estos son datos de RNA-seq, las secuencias duplicadas se conservan, ya que pueden contener información biológica importante para el análisis diferencial.
 
-![fastqc_sequence_duplication_levels_plot.png](/data/fastqc/multiqc_report_data/images/fastqc_sequence_duplication_levels_plot.png)
-Fig. 3. Sequence Duplication Levels
+![fastqc_sequence_duplication_levels_plot.png](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc_sequence_duplication_levels_plot.png)
+Fig. 4. Sequence Duplication Levels
 
 **Secuencias Sobrerepresentadas:**
 En el análisis de secuencias sobrerepresentadas, la mayoría mostró "No hit", indicando que son señales biológicas y no artefactos de secuenciación.
@@ -82,8 +89,8 @@ En el análisis de secuencias sobrerepresentadas, la mayoría mostró "No hit", 
 **Contenido de Adaptadores:**
 La muestra `SRR9126963` presenta contaminación por adaptadores Nextera Transposase. Este adaptador debe ser removido durante la limpieza de los datos.
 
-![fastqc_adapter_content_plot.png](/data/fastqc/multiqc_report_data/images/fastqc_adapter_content_plot.png)
-Fig. 4. Adapter Content
+![fastqc_adapter_content_plot.png](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc_adapter_content_plot.png)
+Fig. 5. Adapter Content
 
 ## 3. Limpieza de Datos con fastp
 
@@ -105,10 +112,13 @@ El script de limpieza usa el programa `fastp`, el código del mismo puede ser en
 **Comparación de los estatus**
 
 Antes de la limpieza:
-![Estatus fastqc crudos](/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_raw.png)
+![Estatus fastqc crudos](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_raw.png)
+Fig. 6. FastQC: Status Checks 
+
 
 Después de la limpieza:
-![Estuatus fastqc procesados](/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_procesado.png)
+![Estuatus fastqc procesados](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_procesado.png)
+Fig. 7. FastQC: Status Checks 
 
 * Se puede observar el estatus a color verde en adaptadores y contenido de base por secuencia, la longitud paso a estatus color amarillo pero era esperable debido al recorte.
 
@@ -226,7 +236,8 @@ Paired-ended
 Para una mejor observación general de los datos se generó una gráfica.
 El código fuente esta disponible en el Apéndice, Sección-IV.
 
-![Gráfica estadísticas](/results/tasa_mapeo_barras_puntos.png)
+![Gráfica estadísticas](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/results/tasa_mapeo_barras_puntos.png)
+Fig. 7. Gráfica de estadísticas 
 
 ## 6. Conclusión
 
@@ -239,6 +250,9 @@ El análisis de los alineamientos muestra un comportamiento consistente de las h
 Los alineamientos obtenidos, particularmente aquellos con alto porcentaje de mapeo único y de forma específica usando el protocolo *paired-end* para minimizar falsos positivos, garantizan datos confiables aptos para utilizarlos con seguridad en subsecuentes estudios de expresión génica diferencial.
 
 **Comparación de tiempos de ejecución:** Relizando la comparación, el modo *paired-end* fue más lento que *single-end* (HISAT2: 46m19.336s vs 21m44.647s; STAR: 25m23.665s vs 13m52.477s), reflejando el costo computacional adicional de imponer concordancia entre pares. Al comparar alineadores, STAR fue consistentemente más rápido que HISAT2 tanto en *single-end* (13m52.477s vs 21m44.647s, 7m52.170s menos) como en *paired-end* (25m23.665s vs 46m19.336s, 20m55.671s menos), con una reducción total de 28m47.841s (39m16.142s vs 1h8m3.983s) al procesar el conjunto completo.
+
+
+> Control de versiones del proyecto por git disponible en [Andttrea/transcriptomica](https://github.com/Andttrea/transcriptomica)
 
 # Apéndice
 
