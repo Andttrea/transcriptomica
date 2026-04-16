@@ -1,10 +1,10 @@
 #!/bin/bash
  
  # Asignamos la variable para el directorio de Hisat2
- SAM_Dir=("/export/storage/users/andreavg/transcriptomica/results/hisat2/single-end"
- "/export/storage/users/andreavg/transcriptomica/results/hisat2/paired-end"
- "/export/storage/users/andreavg/transcriptomica/results/star/single-end"
- "/export/storage/users/andreavg/transcriptomica/results/star/paired-end")
+ SAM_Dir=("/export/storage/users/andreavg/transcriptomica/results/hisat2/single_end"
+ "/export/storage/users/andreavg/transcriptomica/results/hisat2/paired_end"
+ "/export/storage/users/andreavg/transcriptomica/results/star/single_end"
+ "/export/storage/users/andreavg/transcriptomica/results/star/paired_end")
  
  # Recorremos cada directorio de la variable SAM_Dir y convertiremos los archivos SAM a BAM
  for DIR in "${SAM_Dir[@]}"; do
