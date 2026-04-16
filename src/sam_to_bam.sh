@@ -26,7 +26,7 @@
         # --threads 5: Usar 5 hilos para la conversión
         # -T : Usar un archivo temporal para la ordenación
         # -o : Especificar el archivo de salida BAM
-        samtools view -bSq 10 "$SAM" | samtools sort -- threads 5 -T "${SAM}_temp" -o "$BAM"
+        samtools view -bSq 10 "$SAM" | samtools sort -@ 5 -T "${base}_temp" -o "$BAM"
 	 
 	 # Indexamos 
 		samtools index "$BAM"
