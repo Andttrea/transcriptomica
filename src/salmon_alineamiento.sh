@@ -28,13 +28,13 @@ for R1 in /export/storage/users/andreavg/transcriptomica/data/clean/*_1_clean.fa
 # -o: Indicamos donde guardaremos los resultados
 # time se utiliza para medir el tiempo de ejecución del comando salmon y se redirige la salida de error estándar, que es donde se imprime el tiempo, al archivo correspondiente para single-end.
 # usando las {} se asegura que el tiempo se mida solo para el comando salmon y no para otros comandos que puedan estar en el script.
-	{ time salmon quant -i "$index" 
+	{ time salmon quant -i "$index" \
 		-l A -p 5 \
 		-r "$R1" \
 		-o "/export/storage/users/andreavg/transcriptomica/results/salmon/single_end/${base}_SE_" ; } 2>> "$Salmon_time_file_SE" \
 
 # Ejecutamos hisat2 con paired-end
-	echo "Paired-end para $base"
+	#echo "Paired-end para $base"
 #Flags:
 # -i: Nos indica en que lugar se encuentra el index
 # -l: Se utiliza este parámetro para definir las propiedades de la biblioteca de secuenciación, en este caso utilizamos `A` para que Salmon analice una parte de las lecturas para decidir por sí mismo cuál es la configuración correcta
@@ -53,4 +53,4 @@ for R1 in /export/storage/users/andreavg/transcriptomica/data/clean/*_1_clean.fa
 
 done
 
-echo "Alineamiento completado para todas las muestras" 
+echo "Alineamiento completado para todas las muestras"
