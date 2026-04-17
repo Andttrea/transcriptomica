@@ -1,0 +1,10 @@
+{
+    "salmon_version": "1.10.3",
+    "index": "/export/space3/users/silvanac/transcriptomica_2026/indexes/mm39.gencode.M36.salmon/",
+    "libType": "A",
+    "threads": "5",
+    "mates1": "/export/storage/users/andreavg/transcriptomica/data/clean/SRR9126930_1_clean.fastq.gz",
+    "mates2": "/export/storage/users/andreavg/transcriptomica/data/clean/SRR9126930_2_clean.fastq.gz",
+    "output": "/export/storage/users/andreavg/transcriptomica/results/salmon/paired_end/SRR9126930_PE_",
+    "auxDir": "aux_info"
+}
