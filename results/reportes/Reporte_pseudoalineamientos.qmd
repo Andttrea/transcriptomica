@@ -17,7 +17,6 @@ format:
         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\},fontsize=\footnotesize}
 ---
 
-# Reporte de pseudoalineamientos 
 
 ## Planteamiento 
 
@@ -602,7 +601,7 @@ rds_to_tsv(txi_PE,"/export/storage/users/andreavg/transcriptomica/results/salmon
 # Ejecutamos el script
 Rscript rds_to_tsv.R
 ```
-# Discusión
+## Discusión
 
 El análisis comparativo de la cuantificación y el pseudoalineamiento en las muestras de músculo de Mus musculus permite extraer conclusiones técnicas valiosas sobre la eficiencia y precisión de las herramientas empleadas.
 
@@ -646,13 +645,13 @@ En cuanto a la velocidad del procesamiento entre alineadores (STAR y HISAT2) con
 
 Esta eficiencia del pseudoalineamiento se explica porque Salmon no intenta reconstruir la posición base por base en el genoma, sino que asigna directamente los fragmentos al transcriptoma. Sin embargo, como se discutió en clase, la rapidez de Salmon requiere el paso adicional con tximport en R para colapsar los resultados a nivel de gen y permitir una comparación directa con los métodos basados en alineamiento genómico.
 
-# Conclusiones
+## Conclusiones
 
 Tras completar las seis cuantificaciones requeridas por muestra, se concluye que la alta consistencia en las tasas de asignación confirma el éxito de los procesos de limpieza y filtrado previos. 
 El empleo del modo paired-end resultó fundamental, ya que además de incrementar la precisión en el conteo de lecturas, permitió generar visualizaciones de cobertura exentas de duplicaciones artificiales gracias al uso de filtros de paridad. Si bien el pseudoalineamiento con Salmon destaca como una alternativa superior en términos de velocidad y optimización de recursos , presenta la limitante técnica de depender de un transcriptoma de referencia ya generado, lo que restringe el descubrimiento de nuevos transcritos que el mapeo genómico tradicional sí permite identificar. Por esta razón, el flujo de trabajo convencional sigue siendo una herramienta de diagnóstico esencial cuando se requiere una inspección visual detallada o el análisis de la arquitectura del genoma. En definitiva, la elección entre alineamiento y pseudoalineamiento no debe considerarse excluyente; la coordinación de herramientas como STAR e HISAT2 con Salmon , integrada mediante tximport, fortalece la validez técnica de los resultados y proporciona una base robusta para una interpretación biológica profunda.
 
 
-# Referencias
+## Referencias
 
 1. GENCODE - Mouse Release M36. (s. f.). https://www.gencodegenes.org/mouse/release_M36.html 
 2. Bash Reference Manual. (s. f.). https://www.gnu.org/software/bash/manual/bash.html
