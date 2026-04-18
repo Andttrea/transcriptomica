@@ -1,3 +1,22 @@
+---
+title: "Reporte Pseudoalineamientos"
+author: "Andrea Villarruel García"
+date: "2026-04-15"
+lang: es
+
+format:
+  pdf:
+    highlight-style: pygments
+    pdf-engine: xelatex
+    toc: true
+    mainfont: "Times New Roman"
+    fontsize: 11pt
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\},fontsize=\footnotesize}
+---
+
 # Reporte de pseudoalineamientos 
 
 ## Planteamiento 
