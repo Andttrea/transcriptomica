@@ -52,9 +52,12 @@ process fastp {
     tuple val(sample_id), path(reads)
 
     // Definimos los archivos de salida, que serán los archivos fastq generados por el fastp y el reporte html 
+    // NOTA: emit se utiliza para etiquetar cada salida con un nombre específico, lo que facilita su referencia en etapas posteriores del pipeline.
     output: 
-    tuple val(sample_id), path("*_{1,2}.fastq.gz")
-    path "*_fastp_report.html"
+    tuple val(sample_id), path("${sample_id}_1.fastq.gz"),
+    path("${sample_id}_2.fastq.gz"), emit: cleaned_reads
+    // El reporte HTML de fastp se publica como un archivo separado para facilitar su acceso 
+    path "${sample_id}_fastp_report.html", emit: fastp_report
 
     // Bloque del script que correra fastp 
     script:
@@ -119,13 +122,14 @@ process fastqc_cleaned {
 workflow {
     // Creamos un canal que agrupa los archivos FASTQ en pares de lectura 1 y lectura 2 utilizando la función fromFilePairs de Nextflow.
     // NOTA: size 2 indica que cada par debe contener exactamente dos archivos. 
+    // Broadcast se utiliza para compartir el canal entre múltiples procesos, permitiendo que tanto el proceso FastQC para los archivos originales como el proceso FastP para la limpieza accedan a los mismos pares de lectura.
     read_pairs = Channel.fromFilePairs(params.fastq_dir, size: 2)
     // Ejecutamos el proceso FastQC para los archivos FASTQ originales, pasando los pares de lectura al proceso FastQC
     fastqc(read_pairs)
     // Ejecutamos el proceso FastP para limpiar los archivos FASTQ y este genera una tupla con el ID de la muestra y las rutas a los archivos FASTQ limpios, que luego se pasan al proceso FastQC para los archivos limpios
-    fastp_out = fastp(read_pairs)
-    // Ejecutamos el proceso FastQC para los archivos FASTQ limpios
-    fastqc_cleaned(fastp_out)
+    fp = fastp(read_pairs)
+    // Ejecutamos el proceso FastQC para los archivos FASTQ limpios, accedemos a los archivos limpios generados por el proceso FastP a través de la tupla emitida 
+    fastqc_cleaned(fp.out.cleaned_reads)
 }
 
 
