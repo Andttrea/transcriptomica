@@ -1,0 +1,13 @@
+deseq/results/hisat2/paired_end/*
+deseq/!results/hisat2/paired_end/summary
+deseq/results/hisat2/single_end/*
+deseq/!results/hisat2/single_end/summary
+deseq/results/star/single_end/*
+deseq/!results/star/single_end/*Log.final*
+deseq/results/star/paired_end/*
+deseq/!results/star/paired_end/*Log.final*
+deseq/data/metadata
+deseq/data/clean
+deseq/data/SRRs
+deseq/data/fastqc/multiqc_report_data/*txt
+deseq/data/fastqc/multiqc_report_data/multiqc*
