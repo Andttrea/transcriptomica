@@ -4,7 +4,7 @@
 nextflow.enable.dsl = 2
 
 // Definimos los parametros configurables para el pipeline
-params.fastq_dir = '/export/storage/users/andreavg/transcriptomica/deseq/data/SRRs/*_{1,2}.fastq'
+params.fastq_dir = "/export/storage/users/andreavg/transcriptomica/deseq/data/SRRs/*_{1,2}.fastq"
 params.output_dir = "/export/storage/users/andreavg/transcriptomica/nextflow_tarea/results"
 // Definimos los subdirectorios para el pipeline
 params.fastqc_raw_dir = "${params.output_dir}/fastqc_raw"
@@ -28,14 +28,14 @@ process fastqc {
 
     // Definimos la salida como los archivos generados por FastQC
     output:
-    path "*_{1,2}_fastqc.{zip,html}"
+    path "*_fastqc.zip"
+    path "*_fastqc.html"
 
     // El bloque de script ejecuta el comando FastQC para los archivos FASTQ de entrada,
     // generando los resultados en el directorio especificado
     script:
     """
-    mkdir -p ${params.fastqc_raw_dir}
-    fastqc -o ${params.fastqc_raw_dir} ${reads}
+    /export/apps/bioconda/bin/fastqc ${reads}
     """
 }
 
@@ -54,10 +54,7 @@ process fastp {
     // Definimos los archivos de salida, que serán los archivos fastq generados por el fastp y el reporte html 
     // NOTA: emit se utiliza para etiquetar cada salida con un nombre específico, lo que facilita su referencia en etapas posteriores del pipeline.
     output: 
-    tuple val(sample_id), path("${sample_id}_1.fastq.gz"),
-    path("${sample_id}_2.fastq.gz"), emit: cleaned_reads
-    // El reporte HTML de fastp se publica como un archivo separado para facilitar su acceso 
-    path "${sample_id}_fastp_report.html", emit: fastp_report
+    tuple val(sample_id), path("${sample_id}_1.fastq.gz"), path("${sample_id}_2.fastq.gz")
 
     // Bloque del script que correra fastp 
     script:
@@ -77,7 +74,7 @@ process fastp {
     // --length_required: longitud mínima requerida para las lecturas después del recorte
     // -h: archivo de salida para el reporte HTML de fastp
     """
-    fastp \\
+    /export/apps/bioconda/envs/fastp/bin/fastp \\
       -i ${read1} \\
       -I ${read2} \\
       -o ${sample_id}_1.fastq.gz \\
@@ -107,14 +104,14 @@ process fastqc_cleaned {
 
     // Definimos la salida como los archivos generados por FastQC para los archivos FASTQ limpios
     output:
-    path "*_{1,2}_cleaned_fastqc.{zip,html}"
+    path "*_fastqc.zip"
+    path "*_fastqc.html"
 
     // El bloque de script ejecuta el comando FastQC para los archivos FASTQ limpios de entrada
     // Creamos el directorio de salida para los resultados de FastQC limpios si no existe y luego ejecutamos FastQC
     script:
     """
-    mkdir -p ${params.fastqc_cleaned_dir}
-    fastqc -o ${params.fastqc_cleaned_dir} ${clean1} ${clean2}
+    /export/apps/bioconda/bin/fastqc ${clean1} ${clean2}
     """
 }
 
@@ -123,13 +120,13 @@ workflow {
     // Creamos un canal que agrupa los archivos FASTQ en pares de lectura 1 y lectura 2 utilizando la función fromFilePairs de Nextflow.
     // NOTA: size 2 indica que cada par debe contener exactamente dos archivos. 
     // Broadcast se utiliza para compartir el canal entre múltiples procesos, permitiendo que tanto el proceso FastQC para los archivos originales como el proceso FastP para la limpieza accedan a los mismos pares de lectura.
-    read_pairs = Channel.fromFilePairs(params.fastq_dir, size: 2)
+    read_pairs = channel.fromFilePairs(params.fastq_dir, size: 2)
     // Ejecutamos el proceso FastQC para los archivos FASTQ originales, pasando los pares de lectura al proceso FastQC
     fastqc(read_pairs)
-    // Ejecutamos el proceso FastP para limpiar los archivos FASTQ y este genera una tupla con el ID de la muestra y las rutas a los archivos FASTQ limpios, que luego se pasan al proceso FastQC para los archivos limpios
-    fp = fastp(read_pairs)
+    // Ejecutamos el proceso FastP para limpiar los archivos FASTQ y este genera una tupla con el ID de la muestra y las rutas a los archivos FASTQ limpios, 
+    cleaned_reads = fastp(read_pairs)
     // Ejecutamos el proceso FastQC para los archivos FASTQ limpios, accedemos a los archivos limpios generados por el proceso FastP a través de la tupla emitida 
-    fastqc_cleaned(fp.out.cleaned_reads)
+    fastqc_cleaned(cleaned_reads)
 }
 
 
