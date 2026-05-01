@@ -76,9 +76,15 @@ transcriptomica/
 
 ## Metodología y justificación 
 
-Primero crearemos las carpeta donde se guardaran todos los datos generados y el script para el ppipeline de nextflow
+### Pipeline workflow
+
+Primero crearemos las carpeta donde se guardaran todos los datos generados y el script para el pipeline de nextflow.
+
+El flujo de trabajo se codificó para automatizar tres fases secuenciales que transforman el análisis de calidad en un proceso dinámico y reproducible. En la primera fase, se utiliza la función fromFilePairs para agrupar los archivos FASTQ crudos por muestra y generar un diagnóstico inicial con FastQC, identificando posibles sesgos o contaminaciones desde el inicio. Posteriormente, los datos se pasan hacia la segunda fase de limpieza profunda con fastp, donde se ejecutan procesos de detección de adaptadores, recorte de colas de poliguanina y un filtrado de calidad por ventanas deslizantes (--cut_window_size 4, --cut_mean_quality 20) para garantizar la integridad de las lecturas. Finalmente, el pipeline redirige los archivos procesados hacia un segundo control con FastQC, validando la efectividad del trimming y asegurando que los datos limpios tengan la calidad óptima para las etapas posteriores de alineamiento
 
 ```bash
+# Nos movemos a la carpeta donde crearemos de carpeta para nextflow
+cd /export/storage/users/andreavg/transcriptomica/
 mkdir nextflow_tarea
 # Nos movemos a la carpeta y creamos la carpeta de src 
 cd nextflow_tarea
@@ -222,5 +228,54 @@ workflow {
 }
 
 ```
+
+### MultiQC
+
+Con el objetivo de verificar la eficacia del pipeline, se ejecutó MultiQC para agregar los resultados de los archivos limpios. Este proceso permite inspeccionar de forma masiva cómo terminaron las secuencias tras el filtrado
+
+```bash
+# Nos movemos a la carpeta de los archivos fastqc limpios 
+cd /export/storage/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned
+# Creamos la carpeta para guardar los archivos generados por multiqc
+mkdir multiqc
+# Corremos multiqc 
+multiqc ../* -o ./ 
+```
+
+### Discusión 
+
+El análisis final mediante MultiQC muestra que el pipeline en Nextflow sí automatiza correctamente el flujo FastQC -> fastp -> FastQC, pero también permite ver con claridad qué métricas mejoraron y cuáles permanecieron prácticamente igual.
+
+En la figura **Heatmap_datoscrudos**, los archivos sin limpiar presentan el patrón esperado de advertencias de calidad: aparecen módulos en rojo y amarillo, principalmente en **Per Base Sequence Content**, **Sequence Duplication Levels** y algunos casos en **Overrepresented Sequences**. Esto confirma que el punto de partida tenía sesgos de composición y señales de redundancia que requerían limpieza.
+
+![Heatmap_datoscrudos](https://github.com/Andttrea/transcriptomica/blob/main/deseq/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_raw.png) 
+
+En la figura **Heatmap_datoslimpios_manualmente**, se observa una mejora global tras el curado manual. En particular, **Adapter Content** aparece en verde y disminuyen advertencias asociadas a contaminantes técnicos. De igual manera la parte de **Per Base Sequence Content** aparece en verde, indicando que el recorte manual de los primeros nucleótidos eliminó el sesgo de composición inicial logrando una distribución de bases homogénea a lo largo de toda la lectura. 
+
+![Heatmap_datoslimpios_manualmente](https://github.com/Andttrea/transcriptomica/blob/main/deseq/data/fastqc/multiqc_report_data/images/fastqc-status-check-heatmap_procesado.png)
+
+En la figura **Heatmap_datoslimpios_nextflow**, el patrón es muy parecido: **Adapter Content** queda en verde para todas las muestras (señal de trimming efectivo de adaptadores), pero **Per Base Sequence Content** sigue en rojo. Es decir, el pipeline de Nextflow corrigió bien contaminación por adaptadores, aunque no cambió de forma fuerte el sesgo de composición por base.
+
+![Heatmap_datoslimpios_nextflow](https://github.com/Andttrea/transcriptomica/blob/main/nextflow_tarea/results/fastqc_cleaned/multiqc/multiqc_data/images/fastqc-status-check-heatmap_nextflow.png)
+
+La comparación directa entre **Per_base_sequence_SRR126694_1_manualmente** y **fastqc_per_base_sequence-SRR126694_1_nextflow** refuerza que el perfil de las muestras cambia muy poco entre ambos procesos. En ambos gráficos, la variabilidad inicial de bases en los primeros ciclos se mantiene y luego las curvas se estabilizan. Esto sugiere que, para esta muestra, el trimming aplicado no redujo de manera importante la señal de **Per Base Sequence Content** (no "trimmeó" suficientemente ese componente).
+
+![Per_base_sequence_SRR126694_1_manualmente](https://github.com/Andttrea/transcriptomica/blob/main/deseq/data/fastqc/multiqc_report_data/images/fastqc_per_base_sequence-SRR126694_1.png)
+
+![fastqc_per_base_sequence-SRR126694_1_nextflow](https://github.com/Andttrea/transcriptomica/blob/main/nextflow_tarea/results/fastqc_cleaned/multiqc/multiqc_data/images/fastqc_per_base_sequence-SRR126694_1_nextflow.png)
+
+En conjunto, los resultados indican que el flujo en Nextflow fue exitoso para limpieza técnica, sobre todo adaptadores, pero conservó un sesgo de composición que probablemente está asociado a la biología y al protocolo, además de que parte de ese sesgo podría requerir un recorte más agresivo de bases iniciales si el objetivo fuera optimizar estrictamente ese módulo de FastQC. Aun así, considerando la buena calidad general por base y la eliminación de adaptadores, las lecturas siguen siendo utilizables para alineamiento y cuantificación.
+
+
+### Conclusión 
+
+El pipeline implementado en Nextflow permitió automatizar de forma reproducible el control de calidad y la limpieza de lecturas RNA-seq, cumpliendo el objetivo principal del trabajo. En términos técnicos, la estrategia fue efectiva para remover secuencias de adaptadores y mantener una calidad general por base adecuada para análisis posteriores. No obstante, el módulo **Per Base Sequence Content** permaneció con alerta en los datos procesados por Nextflow, y la comparación de perfiles por muestra indica que el sesgo inicial de composición no se corrigió de manera sustancial en todas las lecturas. Por ello, aunque los datos obtenidos son válidos para alineamiento y cuantificación, una mejora futura del flujo consistiría en evaluar un recorte inicial más específico (por ejemplo, de los primeros nucleótidos) para disminuir ese sesgo sin comprometer la longitud ni la calidad global de las secuencias.
+
+
+
+
+
+
+
 
 
