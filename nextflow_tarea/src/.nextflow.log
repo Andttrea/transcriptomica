@@ -1,0 +1,135 @@
+Apr-30 19:13:59.517 [main] DEBUG nextflow.cli.Launcher - $> nextflow run limpieza.nf
+Apr-30 19:13:59.615 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 24.04.3
+Apr-30 19:13:59.639 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/andreavg/.nextflow/plugins; core-plugins: nf-amazon@2.5.2,nf-azure@1.6.0,nf-cloudcache@0.4.1,nf-codecommit@0.2.0,nf-console@1.1.3,nf-ga4gh@1.3.0,nf-google@1.13.2-patch1,nf-tower@1.9.1,nf-wave@1.4.2
+Apr-30 19:13:59.650 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Apr-30 19:13:59.650 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Apr-30 19:13:59.653 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.10.0 in 'deployment' mode
+Apr-30 19:13:59.664 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Apr-30 19:13:59.686 [main] DEBUG nextflow.config.ConfigBuilder - Found config home: /home/andreavg/.nextflow/config
+Apr-30 19:13:59.690 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/andreavg/.nextflow/config
+Apr-30 19:13:59.719 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/andreavg/.nextflow/secrets/store.json
+Apr-30 19:13:59.722 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@4d6f623d] - activable => nextflow.secret.LocalSecretsProvider@4d6f623d
+Apr-30 19:13:59.727 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Apr-30 19:14:00.111 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Apr-30 19:14:00.127 [main] DEBUG nextflow.cli.CmdRun - Launching `limpieza.nf` [grave_lamport] DSL2 - revision: 9b7155b9a5
+Apr-30 19:14:00.129 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Apr-30 19:14:00.129 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Apr-30 19:14:00.187 [main] DEBUG nextflow.Session - Session UUID: 0c505194-adc1-48fb-8b75-836f54c0b193
+Apr-30 19:14:00.187 [main] DEBUG nextflow.Session - Run name: grave_lamport
+Apr-30 19:14:00.188 [main] DEBUG nextflow.Session - Executor pool size: 96
+Apr-30 19:14:00.196 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Apr-30 19:14:00.221 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 24.04.3 build 5916
+  Created: 09-07-2024 19:35 UTC (13:35 CDT)
+  System: Linux 5.14.0-654.el9.x86_64
+  Runtime: Groovy 4.0.21 on OpenJDK 64-Bit Server VM 21-internal-adhoc.conda.src
+  Encoding: UTF-8 (UTF-8)
+  Process: 1198709@chaac.lcg.unam.mx [132.248.220.18]
+  CPUs: 96 - Mem: 754.6 GB (48.5 GB) - Swap: 4 GB (108 KB) - Virtual threads ON
+Apr-30 19:14:00.255 [main] DEBUG nextflow.Session - Work-dir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work [xfs]
+Apr-30 19:14:00.256 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/bin
+Apr-30 19:14:00.266 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Apr-30 19:14:00.277 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Apr-30 19:14:00.298 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Apr-30 19:14:00.306 [main] DEBUG nextflow.util.CustomPoolFactory - Creating virtual thread pool
+Apr-30 19:14:00.353 [main] DEBUG nextflow.Session - Session start
+Apr-30 19:14:00.737 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Apr-30 19:14:00.893 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-30 19:14:00.893 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-30 19:14:00.900 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Apr-30 19:14:00.908 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=96; memory=754.6 GB; capacity=96; pollInterval=100ms; dumpInterval=5m
+Apr-30 19:14:00.911 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Apr-30 19:14:00.997 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-30 19:14:00.997 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-30 19:14:01.005 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Apr-30 19:14:01.005 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Apr-30 19:14:01.009 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: fastqc_cleaned, fastqc, fastp
+Apr-30 19:14:01.010 [main] DEBUG nextflow.Session - Igniting dataflow network (4)
+Apr-30 19:14:01.016 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > fastqc
+Apr-30 19:14:01.016 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: /export/storage/users/andreavg/transcriptomica/deseq/data/SRRs/; pattern: *_{1,2}.fastq; options: [:]
+Apr-30 19:14:01.016 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > fastp
+Apr-30 19:14:01.017 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > fastqc_cleaned
+Apr-30 19:14:01.018 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_551ee3cbc5d3fad5: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/limpieza.nf
+Apr-30 19:14:01.018 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Apr-30 19:14:01.018 [main] DEBUG nextflow.Session - Session await
+Apr-30 19:14:01.268 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.270 [Task submitter] INFO  nextflow.Session - [aa/57f98b] Submitted process > fastp (SRR9126694)
+Apr-30 19:14:01.277 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.278 [Task submitter] INFO  nextflow.Session - [21/f0c77b] Submitted process > fastp (SRR9127454)
+Apr-30 19:14:01.283 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.283 [Task submitter] INFO  nextflow.Session - [ad/e5d89a] Submitted process > fastqc (SRR9126963)
+Apr-30 19:14:01.288 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.289 [Task submitter] INFO  nextflow.Session - [01/ca3ba3] Submitted process > fastqc (SRR9127455)
+Apr-30 19:14:01.299 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.299 [Task submitter] INFO  nextflow.Session - [e1/f45bae] Submitted process > fastqc (SRR9126930)
+Apr-30 19:14:01.304 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.305 [Task submitter] INFO  nextflow.Session - [db/e8d8fb] Submitted process > fastp (SRR9127584)
+Apr-30 19:14:01.309 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.309 [Task submitter] INFO  nextflow.Session - [9c/32ef33] Submitted process > fastqc (SRR9127457)
+Apr-30 19:14:01.313 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.313 [Task submitter] INFO  nextflow.Session - [c1/4d6921] Submitted process > fastqc (SRR9126694)
+Apr-30 19:14:01.317 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.318 [Task submitter] INFO  nextflow.Session - [49/5ec42a] Submitted process > fastp (SRR9127457)
+Apr-30 19:14:01.322 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.323 [Task submitter] INFO  nextflow.Session - [d8/8135de] Submitted process > fastqc (SRR9127454)
+Apr-30 19:14:01.327 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.327 [Task submitter] INFO  nextflow.Session - [cc/484adb] Submitted process > fastp (SRR9126930)
+Apr-30 19:14:01.336 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.338 [Task submitter] INFO  nextflow.Session - [6b/124e5f] Submitted process > fastp (SRR9126963)
+Apr-30 19:14:01.342 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.343 [Task submitter] INFO  nextflow.Session - [1f/dd25ea] Submitted process > fastp (SRR9127455)
+Apr-30 19:14:01.346 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:14:01.347 [Task submitter] INFO  nextflow.Session - [7a/c17f3c] Submitted process > fastqc (SRR9127584)
+Apr-30 19:15:12.155 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 7; name: fastp (SRR9127584); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/db/e8d8fb3a7f618fc7b6853abdb9a14a]
+Apr-30 19:15:12.204 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:15:12.205 [Task submitter] INFO  nextflow.Session - [d2/552363] Submitted process > fastqc_cleaned (SRR9127584)
+Apr-30 19:15:49.871 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 11; name: fastp (SRR9127455); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/1f/dd25eac0cf6c2ea0b4e9a712eab094]
+Apr-30 19:15:49.910 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:15:49.911 [Task submitter] INFO  nextflow.Session - [d6/760691] Submitted process > fastqc_cleaned (SRR9127455)
+Apr-30 19:15:58.793 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: fastp (SRR9127454); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/21/f0c77bbe2475c3a6162cc98d941472]
+Apr-30 19:15:58.818 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:15:58.819 [Task submitter] INFO  nextflow.Session - [43/db85b2] Submitted process > fastqc_cleaned (SRR9127454)
+Apr-30 19:16:08.718 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: fastp (SRR9126930); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/cc/484adbdbeab85656f8032dbe4c2fd3]
+Apr-30 19:16:08.739 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:16:08.740 [Task submitter] INFO  nextflow.Session - [2b/08cd87] Submitted process > fastqc_cleaned (SRR9126930)
+Apr-30 19:16:19.439 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: fastp (SRR9127457); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/49/5ec42a6113095397f126251551ae12]
+Apr-30 19:16:19.465 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:16:19.465 [Task submitter] INFO  nextflow.Session - [3a/f606ed] Submitted process > fastqc_cleaned (SRR9127457)
+Apr-30 19:16:19.705 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 9; name: fastp (SRR9126963); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/6b/124e5f880687b68df582b92ee17062]
+Apr-30 19:16:19.730 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:16:19.731 [Task submitter] INFO  nextflow.Session - [09/4b3ba9] Submitted process > fastqc_cleaned (SRR9126963)
+Apr-30 19:16:21.068 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 13; name: fastp (SRR9126694); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/aa/57f98bcbf8038afefbd05a6e04f0b7]
+Apr-30 19:16:21.087 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Apr-30 19:16:21.087 [Task submitter] INFO  nextflow.Session - [02/78673f] Submitted process > fastqc_cleaned (SRR9126694)
+Apr-30 19:16:24.675 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: fastqc (SRR9127584); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/7a/c17f3c02a381ea0b4a2fc724a91bd2]
+Apr-30 19:17:33.541 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 15; name: fastqc_cleaned (SRR9127584); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/d2/5523632e161bf459add62d06732c50]
+Apr-30 19:17:37.652 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 12; name: fastqc (SRR9127455); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/01/ca3ba312ac675fbf81a27e87354f8d]
+Apr-30 19:17:51.677 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: fastqc (SRR9127454); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/d8/8135dee01389c4f84d49231e10e282]
+Apr-30 19:18:01.615 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 10; name: fastqc (SRR9126963); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/ad/e5d89a9d3fe7cd1d9e1f57dbdb13c3]
+Apr-30 19:18:28.687 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: fastqc (SRR9127457); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/9c/32ef336baeca941225cfb754458921]
+Apr-30 19:18:29.647 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: fastqc (SRR9126930); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/e1/f45baefa47dc2583145fa9b28981e5]
+Apr-30 19:19:01.034 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 7 -- submitted tasks are shown below
+~> TaskHandler[id: 14; name: fastqc (SRR9126694); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/c1/4d692193865095fb6ee6ffcb1e07d8]
+~> TaskHandler[id: 16; name: fastqc_cleaned (SRR9127455); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/d6/76069126704093213f6d643807de63]
+~> TaskHandler[id: 17; name: fastqc_cleaned (SRR9127454); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/43/db85b25789a23a40d82f0ae62cac14]
+~> TaskHandler[id: 18; name: fastqc_cleaned (SRR9126930); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/2b/08cd87dd2e10ac106b6f7e253989e5]
+~> TaskHandler[id: 19; name: fastqc_cleaned (SRR9127457); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/3a/f606edb974559ae3e929714a970e76]
+~> TaskHandler[id: 20; name: fastqc_cleaned (SRR9126963); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/09/4b3ba9c3877e541c8d2f861dec6408]
+~> TaskHandler[id: 21; name: fastqc_cleaned (SRR9126694); status: RUNNING; exit: -; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/02/78673fdecf222e96f1964b25a19a56]
+Apr-30 19:19:10.686 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 14; name: fastqc (SRR9126694); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/c1/4d692193865095fb6ee6ffcb1e07d8]
+Apr-30 19:19:30.264 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 16; name: fastqc_cleaned (SRR9127455); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/d6/76069126704093213f6d643807de63]
+Apr-30 19:19:48.194 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 17; name: fastqc_cleaned (SRR9127454); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/43/db85b25789a23a40d82f0ae62cac14]
+Apr-30 19:20:17.086 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 20; name: fastqc_cleaned (SRR9126963); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/09/4b3ba9c3877e541c8d2f861dec6408]
+Apr-30 19:21:06.887 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 19; name: fastqc_cleaned (SRR9127457); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/3a/f606edb974559ae3e929714a970e76]
+Apr-30 19:21:18.130 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 18; name: fastqc_cleaned (SRR9126930); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/2b/08cd87dd2e10ac106b6f7e253989e5]
+Apr-30 19:21:56.462 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 21; name: fastqc_cleaned (SRR9126694); status: COMPLETED; exit: 0; error: -; workDir: /export/space3/users/andreavg/transcriptomica/nextflow_tarea/src/work/02/78673fdecf222e96f1964b25a19a56]
+Apr-30 19:21:56.475 [main] DEBUG nextflow.Session - Session await > all processes finished
+Apr-30 19:21:56.567 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Apr-30 19:21:56.567 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Apr-30 19:21:56.573 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Apr-30 19:21:56.573 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Apr-30 19:21:56.582 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=21; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=1h 11m 15s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=14; peakCpus=14; peakMemory=0; ]
+Apr-30 19:21:56.813 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Apr-30 19:21:56.833 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Apr-30 19:21:56.834 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

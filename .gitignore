@@ -11,3 +11,6 @@ deseq/data/clean
 deseq/data/SRRs
 deseq/data/fastqc/multiqc_report_data/*txt
 deseq/data/fastqc/multiqc_report_data/multiqc*
+nextflow_tarea/src/.nextflow
+nextflow_tarea/src/work
+nextflow_tarea/results/cleaned
