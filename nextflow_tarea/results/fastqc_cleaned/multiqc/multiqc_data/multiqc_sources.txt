@@ -1,0 +1,15 @@
+Module	Section	Sample Name	Source
+FastQC	all_sections	SRR9126694_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126694_1_fastqc.zip
+FastQC	all_sections	SRR9126694_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126694_2_fastqc.zip
+FastQC	all_sections	SRR9126930_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126930_1_fastqc.zip
+FastQC	all_sections	SRR9126930_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126930_2_fastqc.zip
+FastQC	all_sections	SRR9126963_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126963_1_fastqc.zip
+FastQC	all_sections	SRR9126963_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9126963_2_fastqc.zip
+FastQC	all_sections	SRR9127454_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127454_1_fastqc.zip
+FastQC	all_sections	SRR9127454_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127454_2_fastqc.zip
+FastQC	all_sections	SRR9127455_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127455_1_fastqc.zip
+FastQC	all_sections	SRR9127455_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127455_2_fastqc.zip
+FastQC	all_sections	SRR9127457_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127457_1_fastqc.zip
+FastQC	all_sections	SRR9127457_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127457_2_fastqc.zip
+FastQC	all_sections	SRR9127584_1	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127584_1_fastqc.zip
+FastQC	all_sections	SRR9127584_2	/export/space3/users/andreavg/transcriptomica/nextflow_tarea/results/fastqc_cleaned/SRR9127584_2_fastqc.zip
