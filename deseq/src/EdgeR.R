@@ -1,14 +1,14 @@
 # Cargamos las librerias que utilizaremos 
-library(DESeq2)
 library(ggplot2)
 library(ComplexHeatmap)
 library(dplyr)
 library(tibble)
 library(edgeR)
+library(limma)
 
-# Hacemos una funsión que realice todo el análisis de DESeq2
+# Hacemos una funsión que realice todo el análisis con edgeR
 
-Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) {
+edgeR_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) {
 
   # Creamos la ruta dinámica de salida para guardar los resultados de cada análisis
   fig_dir <- paste0(output_dir, "figuras/")
@@ -17,8 +17,8 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   # Generamos factores ppara la edad y el sexo 
   age <- factor(c("mm_24", "mm_9", "mm_24", "mm_9", "mm_24", rep("mm_9", 2)), levels = c("mm_9", "mm_24"))
   sex <- factor(c(rep("m", 7)))
-  # Asignamos un color para el factor de la edad, en donde mm_9 es lightpink y mm_24 es pink
-  sample_colors <- c("pink", "lightpink", "pink", "lightpink", "pink", rep("lightpink", 2)) 
+  # Asignamos un color para el factor de la edad, en donde mm_9 es lightblue y mm_24 es blue
+  sample_colors <- c("blue", "lightblue", "blue", "lightblue", "blue", rep("lightblue", 2)) 
   # Asignamos a la variable sample_names los nombres de las columnas de la tabla de conteos
   sample_names <- colnames(gene_counts)
 
@@ -31,45 +31,58 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   all(colnames(gene_counts) == rownames(meta_data))
   # Si arroja TRUE, entonces esta todo correcto
 
-  # Cargamos los datos en un objeto DESeq2
-  # NOTA: Usamos round() para redondear los valores de conteo a enteros, ya que DESeq2 requiere conteos enteros. 
-  # Design lo dejamos como ~ 0 + age para que el modelo no tenga intercepto y podamos comparar directamente las condiciones de edad.
-  dds <- DESeqDataSetFromMatrix(countData = round(gene_counts), colData = meta_data, design = ~ 0 + age)
-  design <- model.matrix(~ 0 + age)
+    # Cargamos los datos en un objeto edgeR
+    # NOTA: Usamos round() para redondear los valores de conteo a enteros.
+    # DGEList es el contenedor base en edgeR para conteos, factores y metadatos.
+    # Design lo dejamos como ~ 0 + age para que el modelo no tenga intercepto y podamos comparar directamente las condiciones de edad.
+    dge <- DGEList(counts = round(gene_counts))
+    design <- model.matrix(~ 0 + age)
 
   # FIltramos los genes que contienen una baja expresión, esto que lo haremos con filterByExpr() de edgeR, que nos permite filtrar los genes que no tienen una expresión suficiente para ser considerados en el análisis diferencial.
   # filterByExpr compara la expresión de cada gen con un umbral de expresión mínima para eliminar los genes que no tienen una expresión suficiente 
-  keep <- filterByExpr(dds,design)
+  # NOTA: Le pasamos el diseño para que el filtro sea consistente con las condiciones que vamos a comparar.
+  keep <- filterByExpr(dge, design)
   # Vemos cuantos genes se mantienen después del filtrado
   suma_keep <- sum(keep)
   # Guardamos el número de genes que se mantienen después del filtrado en un archivo de texto
   write.table(suma_keep, paste0(output_dir, "genes_filtrados.txt"), row.names = FALSE, col.names = FALSE, quote = FALSE)
   # Filtramos el objeto DESeq2 para quedarnos solo con los genes que cumplen con el criterio de expresión suficiente
-  dds <- dds[keep,]
+    dge <- dge[keep, , keep.lib.sizes = FALSE]
   # Borramos keep 
   rm(keep)
 
   # Generamos el PCA para visualizar la variabilidad de los datos 
-  # Primero convertimos los datos a vst, el cual minimiza la variabilidad de los datos y hace que sean más adecuados para el PCA.
-  vsd <- vst(dds)
-  # Hacemos el PCA, definiendo intgroup = "age" para que el PCA se coloree por la edad
-  PCA_plot <- plotPCA(vsd, intgroup = "age") + theme_classic(base_size=25, base_line_size = 1)
+  # Calculamos logCPM (conteos por millon en log2) para estabilizar la varianza y hacer comparables las muestras.
+  # prior.count evita log2(0) y reduce el efecto de genes con muy bajo conteo.
+  log_cpm <- cpm(dge, log = TRUE, prior.count = 1)
+  # prcomp espera muestras en filas, por eso transponemos la matriz
+  pca_res <- prcomp(t(log_cpm))
+  pca_df <- data.frame(PC1 = pca_res$x[, 1], PC2 = pca_res$x[, 2], age = meta_data$age)
+  # Hacemos el PCA, definiendo age para colorear por edad
+  PCA_plot <- ggplot(pca_df, aes(x = PC1, y = PC2, color = age)) +
+    geom_point(size = 3) +
+    theme_classic(base_size = 25, base_line_size = 1)
 
   # Guardamos la imagen del PCA
   ggsave(paste0(fig_dir, "PCA_plot.png"), plot = PCA_plot, width = 8, height = 6)
 
-  # Calculamos los factores de normalización, varianza y ajustar el modelo 
-  # NOTA: Utilizamos DESeq() para calcular los factores de normalización, la varianza y ajustar el modelo a los datos.
-  dds <- DESeq(dds)
+    # Calculamos los factores de normalización, dispersión y ajustamos el modelo 
+    # calcNormFactors aplica la normalización TMM para corregir diferencias en profundidad de secuenciación.
+    dge <- calcNormFactors(dge)
+    # estimateDisp calcula la dispersión por gen (biológica) necesaria para el modelo NB de edgeR.
+    dge <- estimateDisp(dge, design)
+    # glmQLFit ajusta el modelo con quasi-likelihood, más robusto para tamaños de muestra pequeños.
+    fit <- glmQLFit(dge, design)
 
   # Ahora calcularemos la TPM (Transcripts Per Million) que calcula cuantos transcritos tendrias si tuvieras un millon de transcritos en total
-  # Añadimos la longitud del gen
-  # NOTA: mcols es una función que permite añadir metadatos a un objeto, usamos rownames(dds) para asegurarnos que la logitud coincida con el gen correcto
-  mcols(dds)$basepairs = annotation[rownames(dds),]
+    # Añadimos la longitud del gen
+    # NOTA: Usamos rownames(dge) para asegurarnos que la logitud coincida con el gen correcto
+    gene_length <- annotation[rownames(dge), 1]
 
-  # Calculamos FPKM y pasamos a log2. FKPM (Fragments Per Kilobase of transcript per Million mapped reads) es una medida de expresión que normaliza por la longitud del gen y por el número total de lecturas mapeadas
-  # NOTA: Le añadimos un pseudoconteo de 0.1 para evitar problemas con los logaritmos de cero
-  log2_fpkm <- log2(fpkm(dds) + 0.1) 
+    # Calculamos FPKM y pasamos a log2. FKPM (Fragments Per Kilobase of transcript per Million mapped reads) es una medida de expresión que normaliza por la longitud del gen y por el número total de lecturas mapeadas
+    # NOTA: En edgeR usamos rpkm() y pasamos la longitud del gen.
+    # Le añadimos un pseudoconteo de 0.1 para evitar problemas con los logaritmos de cero.
+    log2_fpkm <- log2(rpkm(dge, gene.length = gene_length) + 0.1) 
 
   # Escribimos la formula para convertir de FKPM a TPM dentro de un epsacio lograrítmico 
   fpkm2tpm_log2 <- function(fpkm) { fpkm - log2(sum(2^fpkm)) + log2(1e6) } 
@@ -82,15 +95,18 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
 
   # Hacemos el  contraste de expresión diferencial 
   # Checamos los nombres 
-  resultsNames(dds)
-  # Output: 
-  # [1] "agemm_9"  "agemm_24"
+  colnames(design)
   # Hacemos el contraste entre nuestras condiciones, en este caso entre mm_24 y mm_9
   contrast <- makeContrasts(m24_vs_m9 = agemm_24 - agemm_9, levels = design) 
 
   # Hacemos el análisis de expresión diferencial 
-  # Extraemos los resultados y los nombres 
-  res <- results(dds, contrast=contrast[, "m24_vs_m9"])
+  # glmQLFTest aplica el contraste sobre el modelo ajustado.
+  qlf <- glmQLFTest(fit, contrast = contrast[, "m24_vs_m9"])
+  # topTags devuelve una tabla con logFC, FDR, etc. Usamos n = Inf para no truncar resultados.
+  res <- topTags(qlf, n = Inf)$table
+  # Renombramos para mantener el resto del pipeline igual que en DESeq2
+  res$log2FoldChange <- res$logFC
+  res$padj <- res$FDR
   # Añadimos el nombre del gen a la tabla de resultados
   res$Gene_name <- gene_name_map[rownames(res),]
 
@@ -119,7 +135,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
 
   # Ahora procederemos a graficar con un volcanoplot
   # Asignamos los colores para las categorías
-  vpcolors = c("gray", "#de0e99", "#c17803") 
+  vpcolors = c("gray", "#6204a9", "#509a05") 
   names(vpcolors) = c("NO", "DOWN", "UP") 
 
   # Creamos la columna DE en tu objeto de resultados 'res'
@@ -132,7 +148,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   # Creamos la gráfica con ggplot2
   volcano_plot <- ggplot(data = as.data.frame(res), aes(x = log2FoldChange, y = -log10(padj), col = DE)) +
           geom_point(alpha = 0.4, size = 1.5) + 
-          labs(title = "Volcano plot: Músculo 24m vs 9m (Escala Auto)", 
+          labs(title = "Volcano plot", 
                x = "log2 Expression fold change", 
                y = "-log10 FDR") + 
           scale_color_manual(values = vpcolors) +
@@ -180,7 +196,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
               ),
               top_annotation = HeatmapAnnotation(
                   Edad = meta_data$age[orden_columnas],
-                  col = list(Edad = c("mm_9" = "lightpink", "mm_24" = "deeppink"))
+                  col = list(Edad = c("mm_9" = "lightblue", "mm_24" = "blue"))
               )) 
 
   
@@ -221,7 +237,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
               ),
               top_annotation = HeatmapAnnotation(
                   Edad = meta_data$age[orden_columnas],
-                  col = list(Edad = c("mm_9" = "lightpink", "mm_24" = "deeppink"))
+                  col = list(Edad = c("mm_9" = "lightblue", "mm_24" = "blue"))
               ))
 
   
@@ -243,7 +259,7 @@ gene_name_map <- read.delim("/export/storage/users/andreavg/transcriptomica/dese
 base <- "/export/storage/users/andreavg/transcriptomica/deseq/results/"
 
 # Aplicamos la función a cada una de las tablas de conteos con los distintos alineadores y tipos de datos (paired-end y single-end)
-hisat_paired <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/paired_end/featurecounts/global/hisat_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/paired_end/deseq_results/"))
-hisat_single <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/single_end/featurecounts/global/hisat_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/single_end/deseq_results/"))
-star_paired <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/paired_end/featurecounts/global/star_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/paired_end/deseq_results/"))
-star_single <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/single_end/featurecounts/global/star_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/single_end/deseq_results/"))
+hisat_paired <- edgeR_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/paired_end/featurecounts/global/hisat_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/paired_end/edgeR_results/"))
+hisat_single <- edgeR_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/single_end/featurecounts/global/hisat_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/single_end/edgeR_results/"))
+star_paired <- edgeR_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/paired_end/featurecounts/global/star_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/paired_end/edgeR_results/"))
+star_single <- edgeR_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/single_end/featurecounts/global/star_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/single_end/edgeR_results/"))
