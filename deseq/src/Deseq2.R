@@ -14,7 +14,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   fig_dir <- paste0(output_dir, "figuras/")
 
   # Para generar la tabla de metadatos primero generamos factores
-  # Generamos factores ppara la edad y el sexo 
+  # Generamos factores para la edad y el sexo 
   age <- factor(c("mm_24", "mm_9", "mm_24", "mm_9", "mm_24", rep("mm_9", 2)), levels = c("mm_9", "mm_24"))
   sex <- factor(c(rep("m", 7)))
   # Asignamos un color para el factor de la edad, en donde mm_9 es lightpink y mm_24 es pink
