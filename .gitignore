@@ -25,3 +25,7 @@ deseq/results/salmon/single_end/*
 !deseq/results/star/paired_end/edgeR_results/
 !deseq/results/star/single_end/deseq_results/
 !deseq/results/star/single_end/edgeR_results/
+!deseq/results/salmon/single_end/edgeR_results/
+!deseq/results/salmon/single_end/deseq_results/
+!deseq/results/salmon/paired_end/edgeR_results/
+!deseq/results/salmon/paired_end/deseq_results/
