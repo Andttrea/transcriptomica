@@ -17,8 +17,6 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   # Generamos factores para la edad y el sexo 
   age <- factor(c("mm_24", "mm_9", "mm_24", "mm_9", "mm_24", rep("mm_9", 2)), levels = c("mm_9", "mm_24"))
   sex <- factor(c(rep("m", 7)))
-  # Asignamos un color para el factor de la edad, en donde mm_9 es lightpink y mm_24 es pink
-  sample_colors <- c("pink", "lightpink", "pink", "lightpink", "pink", rep("lightpink", 2)) 
   # Asignamos a la variable sample_names los nombres de las columnas de la tabla de conteos
   sample_names <- colnames(gene_counts)
 
@@ -28,8 +26,9 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   meta_data <- meta_data %>% remove_rownames %>% column_to_rownames(var = "sample_names")
 
   # Checaremos que los nombres de la tabla de metadatos estan en el mismo orden que las columnas de los gene_counts
-  all(colnames(gene_counts) == rownames(meta_data))
-  # Si arroja TRUE, entonces esta todo correcto
+  k <- all(colnames(gene_counts) == rownames(meta_data))
+  # Vemos que si arroja TRUE, entonces esta todo correcto
+  print(paste0("Los nombres de las columnas de gene_counts y los nombres de fila de meta_data coinciden: ", k))
 
   # Cargamos los datos en un objeto DESeq2
   # NOTA: Usamos round() para redondear los valores de conteo a enteros, ya que DESeq2 requiere conteos enteros. 
@@ -231,7 +230,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   draw(heatmap_top20)
   # Cerramos el archivo
   dev.off()
-            } 
+} 
 
 # Cargamos los archivos que utilizaremos 
 # NOTA: Usamos row.names = 1 para que la primera columna, que es gene_id, se use como nombres de fila en lugar de una columna 
