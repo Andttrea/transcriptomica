@@ -27,8 +27,9 @@ edgeR_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) {
   meta_data <- meta_data %>% remove_rownames %>% column_to_rownames(var = "sample_names")
 
   # Checaremos que los nombres de la tabla de metadatos estan en el mismo orden que las columnas de los gene_counts
-  all(colnames(gene_counts) == rownames(meta_data))
+  k <- all(colnames(gene_counts) == rownames(meta_data))
   # Si arroja TRUE, entonces esta todo correcto
+  print(paste0("Los nombres de las columnas de gene_counts y los nombres de fila de meta_data coinciden: ", k))
 
   # Cargamos los datos en un objeto DGEList de edgeR (Digital Gene Expression List)
   # NOTA: Usamos round() para redondear los valores de conteo a enteros
@@ -129,7 +130,9 @@ edgeR_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) {
   write.table(suma_up, paste0(output_dir, "genes_up_regulados.txt"), row.names = FALSE, col.names = FALSE, quote = FALSE)
 
   # Hacemos lo mismo para los genes down regulados
+  # Aqui buscamos los genes con log2FoldChange menor a -LFC y padj menor a FDR
   down <- (res$log2FoldChange < -LFC) & (res$padj < FDR)
+  # Reemplazamos los valores NA por FALSE, ya que los genes que no cumplen con los criterios de significancia
   down[which(is.na(down))] = FALSE
   # Guardamos el número de genes down regulados en un archivo de texto
   suma_down <- sum(down)
