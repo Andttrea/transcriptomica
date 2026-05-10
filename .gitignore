@@ -13,4 +13,13 @@ deseq/data/fastqc/multiqc_report_data/*txt
 deseq/data/fastqc/multiqc_report_data/multiqc*
 nextflow_tarea/src/.nextflow
 nextflow_tarea/src/work
-nextflow_tarea/results/cleaned
+nextflow_tarea/results/cleaned 
+
+!deseq/results/hisat2/paired_end/deseq_results/
+!deseq/results/hisat2/paired_end/edgeR_results/
+!deseq/results/hisat2/single_end/deseq_results/
+!deseq/results/hisat2/single_end/edgeR_results/
+!deseq/results/star/paired_end/deseq_results/
+!deseq/results/star/paired_end/edgeR_results/
+!deseq/results/star/single_end/deseq_results/
+!deseq/results/star/single_end/edgeR_results/
