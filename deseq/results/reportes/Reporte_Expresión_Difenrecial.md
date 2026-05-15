@@ -2,9 +2,9 @@
 
 ## Planteamiento
 
-El análisis de expresión diferencial permite identificar genes cuya abundancia cambia entre condiciones biológicas distintas. En este trabajo se comparó tejido muscular de *Mus musculus* de 9 meses contra 24 meses, utilizando como punto de partida los archivos de cuantificación generados para tres estrategias de análisis: alineamiento con HISAT2, alineamiento con STAR y pseudoalineamiento con Salmon, los cuales fueron generados anteriormente. 
+El análisis de expresión diferencial permite identificar genes cuya abundancia cambia entre condiciones biológicas distintas. En este trabajo se comparó el tejido de la extremidad (limb) de *Mus musculus* de 9 meses contra 24 meses, utilizando como punto de partida los archivos de cuantificación generados para tres estrategias de análisis: alineamiento con HISAT2, alineamiento con STAR y pseudoalineamiento con Salmon, los cuales fueron generados anteriormente. 
 
-Se contextualiza el contraste biológico estudiado: el músculo esquelético sufre alteraciones funcionales y moleculares con la edad, incluyendo pérdida de masa y fuerza (sarcopenia), cambios en el metabolismo energético, inflamación de bajo grado y remodelado de la matriz extracelular. En el transcriptoma estas adaptaciones suelen manifestarse como variaciones en la expresión de genes asociados a la biogénesis mitocondrial, la señalización anabólica/catabólica, la respuesta al estrés oxidativo y procesos de reparación tisular. El presente análisis compara las edades para identificar patrones transcripcionales coherentes con la declinación funcional del músculo.
+En el contexto biológico se enmarca en el envejecimiento de los tejidos de la extremidad, el cual presenta una pérdida progresiva de función y cambios moleculares asociados al deterioro sistémico por la edad. Desde una perspectiva transcriptómica, este proceso suele manifestarse como una variación coordinada en la expresión de genes relacionados con el metabolismo energético, la respuesta a estrés celular, la señalización de mantenimiento tisular y el remodelado de la matriz extracelular. En consecuencia, la comparación entre 9 y 24 meses permite identificar una firma de expresión diferencial coherente con el envejecimiento del miembro y generar hipótesis sobre la ruta transcripcional más impactada en esta transición.
 
 El enfoque desarrollado fue preparar correctamente las matrices de conteo y aplicar dos enfoques estadísticos para detectar genes diferencialmente expresados: DESeq2 y edgeR. El objetivo fue evaluar cómo cambian los resultados según el alineador, el modo de secuenciación (single-end o paired-end) y el algoritmo estadístico utilizado.
 
@@ -208,17 +208,9 @@ Rscript condiciones_tabla_counts.R
 
 ### Análisis con DESeq2
 
-El script `Deseq2_hisat_star.R` realizó el análisis para HISAT2 y STAR, mientras que `Deseq2_salmon.R` hizo lo propio para Salmon. En ambos casos el flujo fue similar:
+El script `Deseq2_hisat_star.R` realizó el análisis para HISAT2 y STAR, mientras que `Deseq2_salmon.R` hizo lo propio para Salmon. En ambos casos el flujo incluyó la creación del objeto DESeq2 a partir de la matriz de conteos o del objeto `tximport`, el filtrado de genes de baja expresión para aumentar la potencia estadística, la transformación `vst` para estabilizar la varianza y facilitar la visualización mediante PCA, el ajuste del modelo con `DESeq()` para estimar dispersiones y factores de normalización, el contraste entre `mm_24` y `mm_9` para obtener efectos dirigidos, y el cálculo de tablas de resultados con log2 fold change y FDR seguido de volcano plots y heatmaps para priorizar y visualizar los genes significativos.
 
-- creación del objeto de DESeq2 desde una matriz de conteos o desde `tximport`,
-- filtrado de genes de baja expresión con `filterByExpr`,
-- transformación `vst` para construir un PCA,
-- ajuste del modelo con `DESeq()`,
-- contraste entre `mm_24` y `mm_9`,
-- cálculo de una tabla de resultados con log2 fold change y FDR
-- generación de volcano plots y heatmaps para los genes significativos.
-
-En estos scripts se usaron umbrales de significancia de `FDR < 0.05` y `|log2FC| > 0.5`. Los genes up y down regulados se guardaron en archivos separados, junto con mapas de TPM en escala log2 para apoyar la visualización.
+En estos scripts (DESeq2 y edgeR) se usaron umbrales de significancia de `FDR < 0.05` y `|log2FC| > 0.5`. Los genes up y down regulados se guardaron en archivos separados, junto con mapas de TPM en escala log2 para apoyar la visualización.
 
 ```bash
 # En la carpeta src creamos el script
@@ -652,18 +644,10 @@ Rscript Deseq2_salmon.R
 
 ### Análisis con edgeR
 
-El script `EdgeR_hisat_star.R` aplicó el mismo planteamiento general, pero usando la estructura de edgeR (`DGEList`) y su flujo estadístico. Para Salmon se empleó `EdgeR_salmon.R`, también sobre el objeto `txi` ya consolidado.
+El script `EdgeR_hisat_star.R` aplicó la lógica de edgeR (con `DGEList`) y `EdgeR_salmon.R` procesó el objeto `txi` de Salmon.
 
-La secuencia de trabajo fue:
+La secuencia consistió en construir el objeto `DGEList` desde los conteos, filtrar genes de baja expresión (con `filterByExpr` y `min.count = 20`) para reducir el ruido y mejorar la detección, normalizar con TMM (`calcNormFactors`) para corregir diferencias en tamaños de librería, calcular `logCPM` y realizar PCA para evaluar la variabilidad entre muestras, estimar la dispersión de forma robusta, ajustar el modelo con `glmFit` y realizar la prueba estadística con `glmLRT` para identificar DEGs. Finalmente exportar listas de genes y generar volcano plots y heatmaps para la interpretación visual.
 
-- construcción de `DGEList`,
-- filtrado con `filterByExpr` y `min.count = 20`,
-- normalización TMM con `calcNormFactors`,
-- cálculo de `logCPM` y PCA,
-- estimación robusta de dispersión,
-- ajuste con `glmFit`,
-- contraste con `glmLRT`,
-- exportación de genes significativos, volcano plots y heatmaps.
 
 ```bash
 # Creamos en src el script para hisat2 y star
@@ -1325,7 +1309,6 @@ El heatmap obtenido a partir de Salmon mantiene la separación entre edades pero
 
 Visualmente, Salmon compartió con STAR varias anotaciones en azul que indican represión en `mm_24` (por ejemplo `Ppp1r3c`, `Thbd`, `Ulk2`, `Arl5a`, `Ythdf3`, `Asb1`, `Hif1an`, `Serpinh1`, `Ogn`), y también coincidió en `Rasd2` como uno de los genes sobreexpresados en `mm_24`. No obstante, Salmon introdujó genes diferenciales que no aparecen en las listas top-20 de STAR (por ejemplo `Ube2srt`, `Loxl2`, `Ubs`, `Ifi205`, `Ms4a4a`, `Ldha`, `Cidec`, `Myh4`, `Gfpt2`, `Gvin1`), lo que sugierió que el pseudoalineamiento detectó con mayor sensibilidad (o simplemente con distinto ranking) ciertos genes que los alineadores genómicos no colocaron entre los top-20.
 
-
 Se observó un patrón dominante en los tres heatmaps, en donde predominó la represión relativa en `mm_24` (mayor proporción de genes en azul), por lo que la tendencia general apuntó a una disminución de la expresión de los genes top asociados a los ratones de 24 meses.
 
 Por otra parte, hubo genes conservados entre métodos/alineadores, `Rasd2` y `Dbp` aparecieron repetidamente como sobreexpresados en `mm_24` en STAR (tanto DESeq2 como edgeR) y `Rasd2` también se observó sobreexpresado en Salmon (DESeq2); genes como `Ppp1r3c`, `Thbd`, `Ulk2`, `Arl5a`, `Ythdf3`, `Asb1`, `Hif1an`, `Serpinh1`, `Clic5`, `Col4a1`, `Rimoc1`, `Ibtk`, `Nrep` y `Tfrc` se conservaron repetidamente en la categoría de subexpresión en `mm_24` entre STAR y Salmon o entre DESeq2 y edgeR aplicados sobre STAR.
@@ -1373,7 +1356,7 @@ Asimismo, la implicación de genes vinculados a la autofagia y la proteostasis (
 
 El análisis de expresión diferencial realizado mediante múltiples pipelines de bioinformática ha demostrado que, a pesar de las variaciones técnicas introducidas por diferentes alineadores, métodos estadísticos y tipos de librería, existe un patrón biológico coherente y robusto asociado con el envejecimiento del músculo esquelético en ratones. Los alineadores genómicos HISAT2 y STAR produjeron resultados notablemente concordantes, detectando entre 250 y 380 genes diferencialmente expresados, mientras que el pseudoalineador Salmon identificó un subconjunto más pequeño pero enriquecido en genes altamente significativos. Los métodos estadísticos DESeq2 y edgeR mantuvieron la estructura biológica fundamental aunque con diferencias en sensibilidad, siendo DESeq2 ligeramente más permisivo y edgeR más selectivo. El tipo de librería (paired-end vs single-end) tuvo un impacto menor en los alineadores genómicos, pero mostró una influencia mayor en Salmon, indicando que la robustez de cada estrategia varía según el contexto metodológico.
 
-El consenso entre métodos en genes como `Rasd2`, `Dbp`, `Ppp1r3c`, `Thbd`, `Serpinh1` y otros proporciona mayor confianza en que estos representan verdaderos cambios transcriptómicos asociados con el envejecimiento. La tendencia dominante observada es la represión génica en animales de 24 meses, sugiriendo una disminución de la capacidad anabólica y procesos reparadores en el músculo envejecido, consistente con los mecanismos conocidos de sarcopenia relacionada con la edad. Esta pauta se mantiene consistente a través de PCA, volcano plots y heatmaps, proporcionando múltiples líneas de evidencia que convergen hacia la misma conclusión biológica.
+El consenso entre métodos en genes como `Rasd2`, `Dbp`, `Ppp1r3c`, `Thbd`, `Serpinh1` y otros proporciona mayor confianza en que estos representan verdaderos cambios transcriptómicos asociados con el envejecimiento. La tendencia dominante observada es la represión génica en animales de 24 meses, sugiriendo una disminución de la capacidad anabólica y procesos reparadores en el tejido envejecido.
 
 La comparación de múltiples pipelines ha permitido evaluar la robustez y reproducibilidad del análisis, demostrando que aunque existen diferencias cuantitativas en el número de genes detectados, las tendencias biológicas principales se conservan. Esto subraya la importancia de las herramientas bioinformáticas para el análisis de RNA-seq, ya que la elección de alineador, normalización y método estadístico impacta significativamente los resultados cuantitativos. Sin embargo, cuando múltiples enfoques independientes convergen en conclusiones similares, la confianza en la validez biológica de los hallazgos aumenta considerablemente.
 

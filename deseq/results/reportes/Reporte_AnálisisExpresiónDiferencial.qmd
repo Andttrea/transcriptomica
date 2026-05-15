@@ -31,6 +31,8 @@ format:
 
 El análisis de expresión diferencial permite identificar genes cuya abundancia cambia entre condiciones biológicas distintas. En este trabajo se comparó tejido muscular de *Mus musculus* de 9 meses contra 24 meses, utilizando como punto de partida los archivos de cuantificación generados para tres estrategias de análisis: alineamiento con HISAT2, alineamiento con STAR y pseudoalineamiento con Salmon, los cuales fueron generados anteriormente. 
 
+En el contexto biológico se enmarca en el envejecimiento de los tejidos de la extremidad, el cual presenta una pérdida progresiva de función y cambios moleculares asociados al deterioro sistémico por la edad. Desde una perspectiva transcriptómica, este proceso suele manifestarse como una variación coordinada en la expresión de genes relacionados con el metabolismo energético, la respuesta a estrés celular, la señalización de mantenimiento tisular y el remodelado de la matriz extracelular. En consecuencia, la comparación entre 9 y 24 meses permite identificar una firma de expresión diferencial coherente con el envejecimiento del miembro y generar hipótesis sobre la ruta transcripcional más impactada en esta transición.
+
 El enfoque desarrollado fue preparar correctamente las matrices de conteo y aplicar dos enfoques estadísticos para detectar genes diferencialmente expresados: DESeq2 y edgeR. El objetivo fue evaluar cómo cambian los resultados según el alineador, el modo de secuenciación (single-end o paired-end) y el algoritmo estadístico utilizado.
 
 Los datos, scripts y resultados se encuentran en el directorio `/export/storage/users/andreavg/transcriptomica/deseq`.
@@ -233,17 +235,9 @@ Rscript condiciones_tabla_counts.R
 
 ### Análisis con DESeq2
 
-El script `Deseq2_hisat_star.R` realizó el análisis para HISAT2 y STAR, mientras que `Deseq2_salmon.R` hizo lo propio para Salmon. En ambos casos el flujo fue similar:
+El script `Deseq2_hisat_star.R` realizó el análisis para HISAT2 y STAR, mientras que `Deseq2_salmon.R` hizo lo propio para Salmon. En ambos casos el flujo incluyó la creación del objeto DESeq2 a partir de la matriz de conteos o del objeto `tximport`, el filtrado de genes de baja expresión para aumentar la potencia estadística, la transformación `vst` para estabilizar la varianza y facilitar la visualización mediante PCA, el ajuste del modelo con `DESeq()` para estimar dispersiones y factores de normalización, el contraste entre `mm_24` y `mm_9` para obtener efectos dirigidos, y el cálculo de tablas de resultados con log2 fold change y FDR seguido de volcano plots y heatmaps para priorizar y visualizar los genes significativos.
 
-- creación del objeto de DESeq2 desde una matriz de conteos o desde `tximport`,
-- filtrado de genes de baja expresión con `filterByExpr`,
-- transformación `vst` para construir un PCA,
-- ajuste del modelo con `DESeq()`,
-- contraste entre `mm_24` y `mm_9`,
-- cálculo de una tabla de resultados con log2 fold change y FDR
-- generación de volcano plots y heatmaps para los genes significativos.
-
-En estos scripts se usaron umbrales de significancia de `FDR < 0.05` y `|log2FC| > 0.5`. Los genes up y down regulados se guardaron en archivos separados, junto con mapas de TPM en escala log2 para apoyar la visualización.
+En estos scripts (DESeq2 y edgeR) se usaron umbrales de significancia de `FDR < 0.05` y `|log2FC| > 0.5`. Los genes up y down regulados se guardaron en archivos separados, junto con mapas de TPM en escala log2 para apoyar la visualización.
 
 ```bash
 # En la carpeta src creamos el script
@@ -677,18 +671,10 @@ Rscript Deseq2_salmon.R
 
 ### Análisis con edgeR
 
-El script `EdgeR_hisat_star.R` aplicó el mismo planteamiento general, pero usando la estructura de edgeR (`DGEList`) y su flujo estadístico. Para Salmon se empleó `EdgeR_salmon.R`, también sobre el objeto `txi` ya consolidado.
+El script `EdgeR_hisat_star.R` aplicó la lógica de edgeR (con `DGEList`) y `EdgeR_salmon.R` procesó el objeto `txi` de Salmon.
 
-La secuencia de trabajo fue:
+La secuencia consistió en construir el objeto `DGEList` desde los conteos, filtrar genes de baja expresión (con `filterByExpr` y `min.count = 20`) para reducir el ruido y mejorar la detección, normalizar con TMM (`calcNormFactors`) para corregir diferencias en tamaños de librería, calcular `logCPM` y realizar PCA para evaluar la variabilidad entre muestras, estimar la dispersión de forma robusta, ajustar el modelo con `glmFit` y realizar la prueba estadística con `glmLRT` para identificar DEGs. Finalmente exportar listas de genes y generar volcano plots y heatmaps para la interpretación visual.
 
-- construcción de `DGEList`,
-- filtrado con `filterByExpr` y `min.count = 20`,
-- normalización TMM con `calcNormFactors`,
-- cálculo de `logCPM` y PCA,
-- estimación robusta de dispersión,
-- ajuste con `glmFit`,
-- contraste con `glmLRT`,
-- exportación de genes significativos, volcano plots y heatmaps.
 
 ```bash
 # Creamos en src el script para hisat2 y star
@@ -1232,33 +1218,34 @@ Los análisis de PCA muestran consistentemente una separación por edad (`mm_9` 
 
 ##### Por alineador
 
-![PCA para HISAT2 (paired-end, DESeq2](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/paired_end/deseq_results/figuras/PCA_plot.png)
+::: {layout-ncol=3}
+![PCA HISAT2 (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/paired_end/deseq_results/figuras/PCA_plot.png)
 
+![PCA STAR (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/deseq_results/figuras/PCA_plot.png)
 
-En la figura 1 se observó que las réplicas están muy próximas dentro de cada edad y hay una separación clara entre `mm_9` y `mm_24`, lo que indicó baja variabilidad técnica y una señal biológica fuerte.
+![PCA Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/PCA_plot.png)
+:::
 
-![PCA para STAR (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/deseq_results/figuras/PCA_plot.png) 
+En la figura 1 se observó que las réplicas están muy próximas dentro de cada edad y hay una separación clara entre `mm_9` y `mm_24`, lo que indicó baja variabilidad técnica y una señal biológica fuerte. De igual manera, en la figura 2 se mostró un patrón prácticamente superponible al de HISAT2. Las muestras de cada condición forman nubes compactas y bien separadas. Por su parte, la figura 3 mostró que la separación por edad persistió, pero las réplicas exhiben mayor dispersión que en los alineadores genómicos, lo que sugirió mayor variabilidad atribuible al pseudoalineamiento o a la cuantificación a nivel de transcritos.
 
-De igual manera, en la figura 2 se mostró un patrón prácticamente superponible al de HISAT2. Las muestras de cada condición forman nubes compactas y bien separadas.
-
-![PCA para Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/PCA_plot.png)
-
-Por su parte, la figura 3 mostró que la separación por edad persistió, pero las réplicas exhiben mayor dispersión que en los alineadores genómicos, lo que sugirió mayor variabilidad atribuible al pseudoalineamiento o a la cuantificación a nivel de transcritos.
 
 ##### Por método estadístico: DESeq2 vs edgeR
 
+::: {layout-ncol=2}
 ![PCA para STAR (single-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/single_end/deseq_results/figuras/PCA_plot.png)
 
-
 ![PCA para STAR (single-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/single_end/edgeR_results/figuras/PCA_plot.png)
+:::
 
 Las figuras 4 y 5 mostraron que ambos métodos discriminaron claramente las dos edades. Con DESeq2 las réplicas tendieron a quedar ligeramente más compactas y con edgeR se mostró una dispersión algo mayor pero se conservó la estructura de grupos, por lo que la interpretación biológica principal no cambia.
 
 ##### Por tipo de librería: single-end vs paired-end
 
+::: {layout-ncol=2}
 ![PCA para Salmon (single-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/single_end/edgeR_results/figuras/PCA_plot.png)
 
 ![PCA para Salmon (paired-end, edgeR) ](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/edgeR_results/figuras/PCA_plot.png) 
+:::
 
 En las figuras 6 y 7 se observa que en Salmon se apreció un poco más de sensibilidad al tipo de librería, algunos puntos se alejaron del núcleo del grupo en single-end mientras que en paired-end la agrupación es algo más definida. En HISAT2 y STAR las diferencias entre single- y paired-end son menores y no alteran la separación biológica principal.
 
@@ -1268,17 +1255,17 @@ En conjunto, HISAT2 y STAR produjeron PCAs muy similares, con réplicas compacta
 
 ##### Por alineador
 
+::: {layout-ncol=3}
 ![Volcano plot para STAR (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/deseq_results/figuras/volcano_plot.png)
-
-
-Como se observa en la Figura 8, STAR mostró una nube amplia de puntos significativos, con predominio de genes diferencialmente expresados hacia valores negativos de log2 fold change y una fracción menor hacia valores positivos. Se identificó una concentración considerable de genes con significancia estadística moderada a alta, lo que sugiere una señal transcriptómica intensa entre las dos edades. La dispersión horizontal de los puntos significativos fue amplia, aunque la mayor densidad se concentró cerca del umbral de cambio de expresión, con algunos genes que alcanzaron valores más extremos.
 
 ![Volcano plot para HISAT2 (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/paired_end/deseq_results/figuras/volcano_plot.png)
 
+![Volcano plot para Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/volcano_plot.png)
+:::
+
+Como se observa en la Figura 8, STAR mostró una nube amplia de puntos significativos, con predominio de genes diferencialmente expresados hacia valores negativos de log2 fold change y una fracción menor hacia valores positivos. Se identificó una concentración considerable de genes con significancia estadística moderada a alta, lo que sugiere una señal transcriptómica intensa entre las dos edades. La dispersión horizontal de los puntos significativos fue amplia, aunque la mayor densidad se concentró cerca del umbral de cambio de expresión, con algunos genes que alcanzaron valores más extremos.
 
 Como se aprecia en la Figura 9, HISAT2 presentó un patrón visual muy similar al de STAR, con una distribución asimétrica de genes significativos y una acumulación mayor en el lado de downregulation. Se observó una dispersión también amplia, aunque ligeramente más contenida que en STAR, lo que sugiere una señal diferencial algo más compacta. La cantidad de puntos significativos fue elevada, pero la nube de genes extremos pareció menos extendida que en STAR, con una mayor concentración alrededor de cambios de expresión moderados.
-
-![Volcano plot para Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/volcano_plot.png)
 
 Como se muestra en la Figura 10, Salmon presentó una cantidad menor de genes significativos que en los alineadores genómicos. Se identificó una nube más compacta y una dispersión reducida, lo que sugiere un comportamiento más conservador en la detección de genes diferencialmente expresados. Los cambios de expresión extrema aparecieron en menor número y la mayoría de los puntos significativos se concentró cerca de umbrales moderados de log2 fold change. En consecuencia, Salmon evidenció una señal diferencial más contenida, aunque todavía claramente asociada con el contraste entre edades.
 
@@ -1286,12 +1273,13 @@ En comparación general, STAR e HISAT2 produjeron volcano plots muy semejantes, 
 
 ##### Por método estadístico: DESeq2 vs edgeR
 
+::: {layout-ncol=2}
 ![Volcano plot para STAR (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/deseq_results/figuras/volcano_plot.png)
 
+![Volcano plot para STAR (paired-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/edgeR_results/figuras/volcano_plot.png)
+:::
 
 Como se observa en la Figura 11, DESeq2 mostró una nube amplia de genes significativos, con una clara acumulación de puntos por debajo del eje central y una fracción relevante de genes hacia cambios positivos. Se identificó una distribución densa de puntos que cruzaron los umbrales de significancia, lo que sugiere una detección relativamente permisiva de expresión diferencial. La dispersión fue considerable y coexistieron genes con cambios moderados y genes con magnitudes más extremas, especialmente en el lado negativo del eje horizontal.
-
-![Volcano plot para STAR (paired-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/edgeR_results/figuras/volcano_plot.png)
 
 Como se aprecia en la Figura 12, edgeR mantuvo el patrón biológico general, pero con una distribución visualmente más contenida para los genes upregulated  y con un conjunto de genes significativos algo más selectivo. Se observó una concentración marcada de puntos significativos alrededor de cambios de expresión negativos, aunque la nube global pareció menos densa que en DESeq2. A su vez, algunos genes alcanzaron magnitudes de cambio notables, lo que indica que edgeR destacó un subconjunto más acotado pero con valores extremos bien definidos. En este sentido, edgeR mostró una señal más conservadora, pero con contraste pronunciado en genes puntuales.
 
@@ -1299,12 +1287,14 @@ En la comparación entre ambos métodos, DESeq2 pareció recuperar una mayor can
 
 ##### Por tipo de librería: single-end vs paired-end
 
+::: {layout-ncol=2}
 ![Volcano plot para HISAT2 (paired-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/paired_end/edgeR_results/figuras/volcano_plot.png)
+
+![Volcano plot para HISAT2 (single-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/single_end/edgeR_results/figuras/volcano_plot.png)
+:::
 
 
 Como se observa en la Figura 13, el análisis paired-end presentó una distribución clara de genes diferencialmente expresados, con predominio de puntos significativos en la zona de downregulation y una fracción menor en la zona de upregulation. Se identificó una nube relativamente compacta, pero con una separación nítida respecto del centro del gráfico, lo que sugiere una señal definida y coherente. La dispersión de los puntos fue moderada y los genes significativos alcanzaron cambios de expresión apreciables, aunque sin una expansión excesiva del eje horizontal.
-
-![Volcano plot para HISAT2 (single-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/hisat2/single_end/edgeR_results/figuras/volcano_plot.png)
 
 Como se aprecia en la Figura 14, el análisis single-end conservó el patrón general observado en paired-end, pero mostró una dispersión ligeramente mayor y una distribución algo menos compacta de los puntos significativos. Se observó una señal diferencial todavía clara, aunque con una concentración algo menor de genes cruzando los umbrales de significancia. Los cambios de expresión parecieron más conservadores en algunos sectores y, en conjunto, la nube de puntos mostró una definición visual algo menos nítida que en paired-end. Por ello, el modo paired-end pareció ofrecer una estructura más consistente y fácilmente interpretable.
 
@@ -1312,8 +1302,13 @@ En la comparación entre ambas estrategias de librería, se observó que el patr
 
 #### Heatmaps
 
+::: {layout-ncol=3}
 ![Heatmap top 20 genes STAR (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/deseq_results/figuras/heatmap_top_20_genes.png)
 
+![Heatmap top 20 genes STAR (paired-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/edgeR_results/figuras/heatmap_top_20_genes.png)
+
+![Heatmap top 20 genes Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/heatmap_top_20_genes.png)
+:::
 
 La visualización mostró que existe una separación clara entre `mm_9` y `mm_24`, con bloques de expresión recíprocos que reflejaron el contraste biológico entre las edades. 
 
@@ -1322,18 +1317,12 @@ La visualización mostró que existe una separación clara entre `mm_9` y `mm_24
 
 Observando la columna deeppink (señalando a los ratones de 24 meses) se concluyó que cuando un gen aparece en rojo implica que su expresión relativa es más alta en las réplicas de `mm_24` que en `mm_9`, mientras que el azul indica una expresión relativamente más baja en `mm_24`. En este heatmap dominó un patrón de represión para `mm_24`: la mayoría de los 20 genes seleccionados aparecen en tonos fríos, lo que sugirió una tendencia general hacia la disminución de la expresión génica en la condición `mm_24`. Esto implicó que la respuesta transcriptómica característica de `mm_24` está marcada por una reducción de la abundancia de numerosos transcritos, mientras que solo un pequeño subconjunto (por ejemplo `Rasd2` y `Dbp`) mostró una sobreexpresión marcada.
 
-![Heatmap top 20 genes STAR (paired-end, edgeR)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/star/paired_end/edgeR_results/figuras/heatmap_top_20_genes.png)
-
-
 El heatmap para edgeR reflejó la misma estructura de separación por condición, con réplicas agrupadas por edad y bloques cromáticos invertidos entre `mm_9` y `mm_24`.
 
 - Genes observados en rojo (relativamente sobreexpresados en `mm_24`): Dbp, Rasd2.
 - Genes observados en azul (relativamente subexpresados en `mm_24`): Col4a1, Hr, Clic5, Rimoc1, Ppp1r3c, Ythdf3, Asb1, Ibtk, Arl5a, Pdgfra, Egfr, Thbd, Smox, Serpinf1, Nrep, Tfrc, Ogn, Gsn.
 
 Visualmente, edgeR presentó una gran coincidencia con la imagen generada por DESeq2: la mayoría de los genes top aparecieron subexpresados en `mm_24` (azul) y solo un par de genes muestrarón sobreexpresión (rojo). Entre los dos métodos aplicados sobre STAR, coincidierón de forma explícita genes como `Dbp` y `Rasd2` (sobreexpresados en `mm_24`) y un amplio conjunto de genes subexpresados (por ejemplo `Col4a1`, `Clic5`, `Rimoc1`, `Ppp1r3c`, `Ythdf3`, `Asb1`, `Ibtk`, `Arl5a`, `Thbd`, `Smox`, `Nrep`, `Tfrc`). EdgeR pareció detectar una represión más extensa o consistente en el subconjunto top-20 (es decir, incorpora varios genes adicionales en azul) y también destacó genes propios que no fueron incluidos en la lista top de DESeq2 para STAR (por ejemplo `Hr`, `Pdgfra`, `Egfr`, `Serpinf1`, `Gsn`, `Ogn`), lo que sugierió que edgeR puede ser más sensible o más selectivo hacia ciertos patrones de disminución de expresión en este conjunto.
-
-![Heatmap top 20 genes Salmon (paired-end, DESeq2)](https://raw.githubusercontent.com/Andttrea/transcriptomica/refs/heads/main/deseq/results/salmon/paired_end/deseq_results/figuras/heatmap_top_20_genes.png)
-
 
 El heatmap obtenido a partir de Salmon mantiene la separación entre edades pero presentó una heterogeneidad de intensidades algo mayor que los alineadores genómicos.
 
@@ -1378,14 +1367,16 @@ En general, el tipo de librería tuvo un efecto menor sobre los alineadores gen�
 
 Un hallazgo importante es el alto grado de concordancia entre métodos para los genes "top". Los genes identificados consistentemente (como `Rasd2`, `Dbp`, `Serpinh1`, `Ppp1r3c`, `Thbd`) a través de diferentes alineadores y métodos estadísticos pueden considerarse como señales biológicas altamente robustas. Esta concordancia es especialmente evidente en los heatmaps de STAR con DESeq2 y edgeR, donde la mayoría de los 20 genes principales son los mismos o están presentes en ambos análisis. El hecho de que Salmon, a pesar de detectar menos genes totales, también recupere muchos de estos mismos genes "top" refuerza la confianza en que estos representan verdaderos cambios de expresión asociados con el envejecimiento.
 
+Además, algunos de estos genes apuntan a procesos biológicamente muy plausibles en músculo esquelético envejecido. Por ejemplo, la recurrencia de Dbp sugiere alteraciones del componente circadiano del músculo, relevante para la regulación temporal del metabolismo, la regeneración y el mantenimiento de la masa muscular, procesos cuya desorganización se ha vinculado con envejecimiento. De manera similar, la detección consistente de Serpinh1 podría reflejar cambios en maduración de colágeno y remodelado de matriz extracelular, dado que HSP47/SERPINH1 actúa como chaperona específica de colágeno y su aumento suele asociarse con reorganización estromal y respuestas fibróticas. Asimismo, la presencia repetida de Ppp1r3c es compatible con modificaciones en el manejo del glucógeno y la flexibilidad metabólica del tejido muscular, dimensiones que también tienden a deteriorarse con la edad. 
+
 Inversamente, genes que difieren entre métodos (por ejemplo, `Hr`, `Pdgfra`, `Egfr`, `Serpinf1`, `Gsn` detectados principalmente por edgeR en STAR; o `Loxl2`, `Ubs`, `Ifi205`, `Ms4a4a`, `Ldha`, `Cidec`, `Myh4`, `Gfpt2`, `Gvin1` únicos a Salmon) pueden representar señales más débiles o dependientes del método, y podrían requerir validación experimental adicional.
 
 
 ## Conclusión
 
-El análisis de expresión diferencial realizado mediante múltiples pipelines de bioinformática ha demostrado que, a pesar de las variaciones técnicas introducidas por diferentes alineadores, métodos estadísticos y tipos de librería, existe un patrón biológico coherente y robusto asociado con el envejecimiento del músculo esquelético en ratones. Los alineadores genómicos HISAT2 y STAR produjeron resultados notablemente concordantes, detectando entre 250 y 380 genes diferencialmente expresados, mientras que el pseudoalineador Salmon identificó un subconjunto más pequeño pero enriquecido en genes altamente significativos. Los métodos estadísticos DESeq2 y edgeR mantuvieron la estructura biológica fundamental aunque con diferencias en sensibilidad, siendo DESeq2 ligeramente más permisivo y edgeR más selectivo. El tipo de librería (paired-end vs single-end) tuvo un impacto menor en los alineadores genómicos, pero mostró una influencia mayor en Salmon, indicando que la robustez de cada estrategia varía según el contexto metodológico.
+El análisis de expresión diferencial realizado mediante múltiples pipelines de bioinformática ha demostrado que, a pesar de las variaciones técnicas introducidas por diferentes alineadores, métodos estadísticos y tipos de librería, existe un patrón biológico coherente y robusto asociado con el envejecimiento del músculo esquelético en ratones. Los alineadores genómicos HISAT2 y STAR produjeron resultados notablemente concordantes, detectando entre 250 y 380 genes diferencialmente expresados, mientras que el pseudoalineador Salmon identificó un subconjunto más pequeño pero enriquecido en genes altamente significativos. Los métodos estadísticos DESeq2 y edgeR mantuvieron la estructura biológica fundamental aunque con diferencias en sensibilidad, siendo DESeq2 ligeramente más permisivo y edgeR más selectivo. El tipo de librería (paired-end vs single-end) tuvo un impacto menor en los alineadores genómicos, pero mostró una influencia mayor en Salmon, indicando que la robustez de cada estrategia varía según el contexto metodológico. 
 
-El consenso entre métodos en genes como `Rasd2`, `Dbp`, `Ppp1r3c`, `Thbd`, `Serpinh1` y otros proporciona mayor confianza en que estos representan verdaderos cambios transcriptómicos asociados con el envejecimiento. La tendencia dominante observada es la represión génica en animales de 24 meses, sugiriendo una disminución de la capacidad anabólica y procesos reparadores en el músculo envejecido, consistente con los mecanismos conocidos de sarcopenia relacionada con la edad. Esta pauta se mantiene consistente a través de PCA, volcano plots y heatmaps, proporcionando múltiples líneas de evidencia que convergen hacia la misma conclusión biológica.
+El consenso entre métodos en genes como `Rasd2`, `Dbp`, `Ppp1r3c`, `Thbd`, `Serpinh1` y otros proporciona mayor confianza en que estos representan verdaderos cambios transcriptómicos asociados con el envejecimiento. La tendencia dominante observada es la represión génica en animales de 24 meses, sugiriendo una disminución de la capacidad anabólica y procesos reparadores en el músculo envejecido, consistente con los mecanismos conocidos de sarcopenia relacionada con la edad. Esta pauta se mantiene consistente a través de PCA, volcano plots y heatmaps, proporcionando múltiples líneas de evidencia que convergen hacia la misma conclusión biológica. Adicionalmente, la participación recurrente de genes relacionados con ritmos circadianos, metabolismo energético y matriz extracelular sugiere que el envejecimiento muscular no solo reduce programas anabólicos, sino que también altera la temporalidad metabólica del tejido y favorece un microambiente menos plástico y potencialmente más propenso al remodelado fibrótico
 
 La comparación de múltiples pipelines ha permitido evaluar la robustez y reproducibilidad del análisis, demostrando que aunque existen diferencias cuantitativas en el número de genes detectados, las tendencias biológicas principales se conservan. Esto subraya la importancia de las herramientas bioinformáticas para el análisis de RNA-seq, ya que la elección de alineador, normalización y método estadístico impacta significativamente los resultados cuantitativos. Sin embargo, cuando múltiples enfoques independientes convergen en conclusiones similares, la confianza en la validez biológica de los hallazgos aumenta considerablemente.
 
@@ -1396,3 +1387,6 @@ La comparación de múltiples pipelines ha permitido evaluar la robustez y repro
 2. Love, M. I., Huber, W., & Anders, S. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2. *Genome Biology*.
 3. Robinson, M. D., McCarthy, D. J., & Smyth, G. K. (2010). edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. *Bioinformatics*.
 4. Valle-García, D. (2026). Clase 8: Expresión diferencial [Notas de clase en formato HTML]. EPI AGING LAB, Cinvestav 
+5. Ito, S., & Nagata, K. (2017). Biology of Hsp47 (Serpin H1), a collagen-specific molecular chaperone. Seminars in cell & developmental biology, 62, 142–151. https://doi.org/10.1016/j.semcdb.2016.11.005 
+6. Chatterjee, S., & Ma, K. (2016). Circadian clock regulation of skeletal muscle growth and repair. F1000Research, 5, 1549. https://doi.org/10.12688/f1000research.9076.1 
+7. Montori-Grau, M., Guitart, M., García-Martínez, C., Orozco, A., & Gómez-Foix, A. M. (2011). Differential pattern of glycogen accumulation after protein phosphatase 1 glycogen-targeting subunit PPP1R6 overexpression, compared to PPP1R3C and PPP1R3A, in skeletal muscle cells. BMC biochemistry, 12, 57. https://doi.org/10.1186/1471-2091-12-57 
