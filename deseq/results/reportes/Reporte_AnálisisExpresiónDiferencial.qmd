@@ -1,7 +1,7 @@
 ---
 title: "Reporte Análisis de Expresión Diferencial"
 author: "Andrea Villarruel García"
-date: "2026-05-10"
+date: "2026-05-14"
 lang: es
 
 format:
@@ -11,9 +11,19 @@ format:
     toc: true
     mainfont: "Times New Roman"
     fontsize: 11pt
+    geometry:
+      - top=20mm
+      - bottom=20mm
+      - left=20mm
+      - right=20mm
+    fig-width: 6
+    fig-height: 4
+    fig-align: center
+    fig-pos: 'H' 
     include-in-header:
       text: |
         \usepackage{fvextra}
+        \usepackage{float}
         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\},fontsize=\footnotesize}
 ---
 

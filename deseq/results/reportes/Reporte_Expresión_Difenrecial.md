@@ -4,6 +4,8 @@
 
 El análisis de expresión diferencial permite identificar genes cuya abundancia cambia entre condiciones biológicas distintas. En este trabajo se comparó tejido muscular de *Mus musculus* de 9 meses contra 24 meses, utilizando como punto de partida los archivos de cuantificación generados para tres estrategias de análisis: alineamiento con HISAT2, alineamiento con STAR y pseudoalineamiento con Salmon, los cuales fueron generados anteriormente. 
 
+Se contextualiza el contraste biológico estudiado: el músculo esquelético sufre alteraciones funcionales y moleculares con la edad, incluyendo pérdida de masa y fuerza (sarcopenia), cambios en el metabolismo energético, inflamación de bajo grado y remodelado de la matriz extracelular. En el transcriptoma estas adaptaciones suelen manifestarse como variaciones en la expresión de genes asociados a la biogénesis mitocondrial, la señalización anabólica/catabólica, la respuesta al estrés oxidativo y procesos de reparación tisular. El presente análisis compara las edades para identificar patrones transcripcionales coherentes con la declinación funcional del músculo.
+
 El enfoque desarrollado fue preparar correctamente las matrices de conteo y aplicar dos enfoques estadísticos para detectar genes diferencialmente expresados: DESeq2 y edgeR. El objetivo fue evaluar cómo cambian los resultados según el alineador, el modo de secuenciación (single-end o paired-end) y el algoritmo estadístico utilizado.
 
 Los datos, scripts y resultados se encuentran en el directorio `/export/storage/users/andreavg/transcriptomica/deseq`.
@@ -1362,6 +1364,10 @@ Un hallazgo importante es el alto grado de concordancia entre métodos para los 
 
 Inversamente, genes que difieren entre métodos (por ejemplo, `Hr`, `Pdgfra`, `Egfr`, `Serpinf1`, `Gsn` detectados principalmente por edgeR en STAR; o `Loxl2`, `Ubs`, `Ifi205`, `Ms4a4a`, `Ldha`, `Cidec`, `Myh4`, `Gfpt2`, `Gvin1` únicos a Salmon) pueden representar señales más débiles o dependientes del método, y podrían requerir validación experimental adicional.
 
+Se observa además que varios genes recurrentes entre métodos apuntan a procesos biológicos coherentes con el envejecimiento muscular. Por ejemplo, la recuperación consistente de `Dbp` y `Rasd2` sugiere una reprogramación del control circadiano y de rutas de señalización relacionadas con el metabolismo energético; `Dbp` actúa como modulador de ritmos circadianos que regulan genes metabólicos, por lo que su alteración podría asociarse a desajustes temporales en la homeostasis energética del músculo envejecido. De forma complementaria, la presencia de genes relacionados con el plegamiento y la remodelación de la matriz extracelular (`Serpinh1`, `Col4a1`) y factores con roles vasculares o inflamatorios (`Thbd`) sugiere procesos de fibrosis y cambios en el microambiente tisular que acompañan a la edad.
+
+Asimismo, la implicación de genes vinculados a la autofagia y la proteostasis (`Ulk2`, `Ythdf3`) y de reguladores del metabolismo glucídico (`Ppp1r3c`) indica una posible desviación del balance anabólico-catabólico en los animales de 24 meses. Estos marcadores pueden reflejar una menor capacidad de mantenimiento y reparación celular, mayor estrés oxidativo y alteraciones en el metabolismo mitocondrial, todos ellos consistentes con fenómenos descritos en la sarcopenia. En conjunto, estos patrones transcriptómicos forman un perfil biológico coherente que justifica análisis complementarios de enriquecimiento funcional (GO/KEGG) y validaciones dirigidas por qPCR, proteómica o histología para confirmar la repercusión a nivel de proteína y tejido.
+
 
 ## Conclusión
 
@@ -1370,6 +1376,8 @@ El análisis de expresión diferencial realizado mediante múltiples pipelines d
 El consenso entre métodos en genes como `Rasd2`, `Dbp`, `Ppp1r3c`, `Thbd`, `Serpinh1` y otros proporciona mayor confianza en que estos representan verdaderos cambios transcriptómicos asociados con el envejecimiento. La tendencia dominante observada es la represión génica en animales de 24 meses, sugiriendo una disminución de la capacidad anabólica y procesos reparadores en el músculo envejecido, consistente con los mecanismos conocidos de sarcopenia relacionada con la edad. Esta pauta se mantiene consistente a través de PCA, volcano plots y heatmaps, proporcionando múltiples líneas de evidencia que convergen hacia la misma conclusión biológica.
 
 La comparación de múltiples pipelines ha permitido evaluar la robustez y reproducibilidad del análisis, demostrando que aunque existen diferencias cuantitativas en el número de genes detectados, las tendencias biológicas principales se conservan. Esto subraya la importancia de las herramientas bioinformáticas para el análisis de RNA-seq, ya que la elección de alineador, normalización y método estadístico impacta significativamente los resultados cuantitativos. Sin embargo, cuando múltiples enfoques independientes convergen en conclusiones similares, la confianza en la validez biológica de los hallazgos aumenta considerablemente.
+
+Se recomienda abordar las hipótesis generadas mediante análisis de enriquecimiento funcional (por ejemplo, rutas mitocondriales, remodelado de matriz extracelular, autofagia y regulación circadiana) y validar experimentalmente los genes consenso mediante qPCR y ensayos proteómicos o histológicos. En particular, la convergencia en genes como `Rasd2`, `Dbp`, `Ppp1r3c` y `Serpinh1` prioriza estos candidatos para estudios funcionales que evalúen su rol en la pérdida de masa y función muscular asociada a la edad. Estas validaciones fortalecerán la interpretación biológica y facilitarán la identificación de posibles dianas para intervenciones que mitiguen la sarcopenia.
 
 
 ## Referencias
