@@ -92,6 +92,7 @@ Deseq2_analysis <- function(gene_counts, annotation, gene_name_map, output_dir) 
   res <- results(dds, contrast=contrast[, "m24_vs_m9"])
   # Añadimos el nombre del gen a la tabla de resultados
   res$Gene_name <- gene_name_map[rownames(res),]
+  saveRDS(res, paste0(output_dir, "DESeq2_results.rds"))
 
   # Establecemos los tresholds para LFC y FDR
   FDR <- 0.05 # Escogemos un FDR de 0.05 para ser un poco más permisivos 
@@ -242,7 +243,7 @@ gene_name_map <- read.delim("/export/storage/users/andreavg/transcriptomica/dese
 base <- "/export/storage/users/andreavg/transcriptomica/deseq/results/"
 
 # Aplicamos la función a cada una de las tablas de conteos con los distintos alineadores y tipos de datos (paired-end y single-end)
+star_paired <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/paired_end/featurecounts/global/star_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/paired_end/deseq_results/"))
 hisat_paired <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/paired_end/featurecounts/global/hisat_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/paired_end/deseq_results/"))
 hisat_single <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/hisat2/single_end/featurecounts/global/hisat_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "hisat2/single_end/deseq_results/"))
-star_paired <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/paired_end/featurecounts/global/star_pe_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/paired_end/deseq_results/"))
 star_single <- Deseq2_analysis(read.delim("/export/storage/users/andreavg/transcriptomica/deseq/results/star/single_end/featurecounts/global/star_se_counts_condicion.tsv", row.names = 1), annotation, gene_name_map, paste0(base, "star/single_end/deseq_results/"))
