@@ -2,8 +2,8 @@
 library(DESeq2)
 library(org.Mm.eg.db)
 library(clusterProfiler)
-library(enrichplot) # Necesaria para gseaplot2 (gráficos más estéticos)
-library(ggplot2)    # Para guardar las gráficas
+library(enrichplot) 
+library(ggplot2)    
 
 # Definimos rutas de entrada y salida
 input_file <- "/export/storage/users/andreavg/transcriptomica/deseq/results/star/paired_end/deseq_results/DESeq2_results.rds"
